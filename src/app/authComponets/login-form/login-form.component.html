@@ -1,0 +1,89 @@
+<!--<div *ngIf="!showFirstError || !showSecondError" class="icons-wrapper">-->
+<!--  <div *ngIf="emailError">-->
+<!--    <i-bs class="x-icon" (click)="hideFirstError()" name="x-square"></i-bs>-->
+<!--    <p class="errors">-->
+<!--      {{emailError}}-->
+<!--    </p>-->
+<!--  </div>-->
+<!--  <div *ngIf="passwordError">-->
+<!--    <i-bs class="x-icon" (click)="hideSecondError()" name="x-square"></i-bs>-->
+<!--    <p class="errors">-->
+<!--      {{passwordError}}-->
+<!--    </p>-->
+<!--  </div>-->
+<!--</div>-->
+
+<body>
+
+<!--<div *ngIf="loading" class="loader-container">-->
+<!--  <p >Loading...</p>-->
+<!--  <div class="loader">-->
+<!--  </div>-->
+<!--</div>-->
+<div class="login-card">
+  <p class="login-sign">Login</p>
+  <img class="profile-picture" src="{{url}}" alt="profile_picture"/>
+  <div class="custom-container">
+    <form>
+      <div class="icons-wrapper">
+        <div class="email-icon">
+          <div *ngIf="emailError" class="errors">
+            {{emailError}}
+          </div>
+          <i-bs name="envelope"></i-bs>
+          <input id="email-bar"
+                 type="email"
+                 name="email"
+                 placeholder="Enter your email"
+                 [(ngModel)]="user.email"
+                 [pattern]="emailPattern"
+          />
+        </div>
+
+        <div class="key-icon">
+          <div *ngIf="passwordError" class="errors">
+            {{passwordError}}
+          </div>
+
+          <i-bs name="key"></i-bs>
+          <input id="password-bar"
+                 type="password"
+                 name="password"
+                 placeholder="Enter your password"
+                 #passwordInput
+                 [(ngModel)]="user.password"
+          />
+        </div>
+      </div>
+      <div class="form-check" (click)="rememberValue($event)">
+        <input class="form-check-input" type="checkbox"
+               id="flexCheckDefault"
+               name="rememberMe"
+               [checked]="remember"
+               [(ngModel)]="remember"
+        />
+        <label class="form-check-label" for="flexCheckDefault">
+          <b>Remember me</b>
+        </label>
+      </div>
+
+      <button id="login-button"
+              type="submit"
+              (click)="onSubmit()"
+      >
+        {{loading ? 'Loading...' : 'LOGIN'}}
+      </button>
+
+      <p class="or-sign">OR</p>
+
+      <button id="register-button"
+              type="submit"
+              routerLink="/register"
+      >
+        REGISTER
+      </button>
+
+    </form>
+  </div>
+</div>
+</body>

@@ -1,0 +1,115 @@
+<body>
+<div class="register-card">
+  <p class="register-sign">Register</p>
+  <form>
+    <div class="row">
+      <div class="col">
+        <div class="custom-container">
+
+          <p *ngIf="emailError" class="errors">
+            {{emailError}}
+          </p>
+          <div class="icons-wrapper">
+            <div class="email-icon">
+              <i-bs name="envelope"></i-bs>
+
+              <input class="bars"
+                     type="email"
+                     placeholder="Email"
+                     name="email"
+                     [(ngModel)]="user.email"
+              />
+            </div>
+
+            <p *ngIf="firstNameError" class="errors">
+              {{firstNameError}}
+            </p>
+            <div class="person-icon">
+              <i-bs name="person"></i-bs>
+
+              <input class="bars"
+                     type="text"
+                     placeholder="First Name"
+                     name="firstName"
+                     [(ngModel)]="user.firstName"
+              />
+            </div>
+
+            <p *ngIf="lastNameError" class="errors">
+              {{lastNameError}}
+            </p>
+            <div class="person-icon">
+              <i-bs name="person"></i-bs>
+
+              <input class="bars"
+                     type="text"
+                     placeholder="Last Name"
+                     name="lastName"
+                     [(ngModel)]="user.lastName"
+              />
+            </div>
+
+            <p *ngIf="passwordError" class="errors">
+              {{passwordError}}
+            </p>
+            <div class="key-icon">
+              <i-bs name="key"></i-bs>
+
+              <input class="bars"
+                     type="password"
+                     placeholder="Password"
+                     name="password"
+                     [(ngModel)]="user.password"
+              />
+            </div>
+
+            <p *ngIf="confirmPasswordError" class="errors">
+              {{confirmPasswordError}}
+            </p>
+            <div class="check-icon">
+              <i-bs name="check2"></i-bs>
+              <input class="bars"
+                     type="password"
+                     placeholder="Confirm Password"
+                     name="confirmPassword"
+                     [(ngModel)]="confirmPassword"
+              />
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="col-sm-5">
+        <div class="image-container">
+          <p *ngIf="fileError" class="errors">
+            {{fileError}}
+          </p>
+          <form method="post" enctype="multipart/form-data">
+            <label style="color: white;margin-right: 10px"
+                   for="uploadImage">{{message ? message : 'Your Photo: ' }}</label>
+            <input (change)="onFileChanged($event)"
+                   style="color: white"
+                   type="file"
+                   id="uploadImage"
+                   name="image"
+                   accept="image/png, image/jpeg"
+            />
+          </form>
+          <img *ngIf="url" alt="uploaded_pic" class="profile-picture" src="{{url}}"/>
+        </div>
+      </div>
+    </div>
+    <button class="register-button"
+            (click)="onSubmit()"
+            type="button"
+    >
+      {{ loading ? 'Loading...' : 'REGISTER' }}
+
+    </button>
+
+
+  </form>
+</div>
+
+</body>
