@@ -14,7 +14,6 @@ export class LoginUser {
 export class RegisterUser {
   constructor(
     public email: string,
-    public fileName: string,
     public firstName: string,
     public lastName: string,
     public password: string
@@ -38,6 +37,27 @@ export class HttpClientService {
 
   public loginUser(user: LoginUser): Observable<any> {
     return this.httpClient.post(this.url + 'login', user, {observe: 'response'})
+  }
+
+  public logoutUser(id: string): Observable<any>{
+    return this.httpClient.get(this.url + 'logout/' + id, {observe: 'response'})
+  }
+
+  public isUserActive(id: string): Observable<any>{
+    return this.httpClient.get(this.url + 'isActive/' + id, {observe: 'response'})
+  }
+
+  public lastSeen(id: string): Observable<any>{
+    return  this.httpClient.get(this.url + id + "/lastSeen" ,{observe: 'response'})
+  }
+
+
+  public lastLogon(id: string): Observable<any>{
+    return  this.httpClient.get(this.url +id+"/lastLogon" ,{observe: 'response'})
+  }
+
+  public changeStatus(id: string, status:boolean): Observable<any> {
+    return this.httpClient.get(this.url + id+'/status='+ status, {observe: 'response'})
   }
 
 }

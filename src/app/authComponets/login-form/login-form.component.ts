@@ -141,21 +141,21 @@ export class LoginFormComponent implements OnInit {
     if (token != null) {
       this.user.email = (this.jwtHelper.decodeToken(token))['sub']
       this.remember = true
-      this.getClientProfile(token);
+      // this.getClientProfile(token);
     }
   }
 
-  getClientProfile(token:any) {
-    token = window.localStorage.getItem("token")
-      this.httpFile.getFile((this.jwtHelper.decodeToken(token))['profile_picture']).subscribe(
-        data => {
-          this.url = "data:image/png;base64," + data.headers.get("File-Data");
-        },
-        error => {
-          console.log(error)
-        }
-      )
-    }
+  // getClientProfile(token:any) {
+  //   token = window.localStorage.getItem("token")
+  //     this.httpFile.getFile((this.jwtHelper.decodeToken(token))['profile_picture']).subscribe(
+  //       data => {
+  //         this.url = "data:image/png;base64," + data.headers.get("File-Data");
+  //       },
+  //       error => {
+  //         console.log(error)
+  //       }
+  //     )
+  //   }
 
   onSubmit() {
     let isFormValid = this.validationForm();

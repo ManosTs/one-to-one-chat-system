@@ -2,22 +2,33 @@
 <div class="navbar navbar-expand-md bg-dark">
 
   <div ngbDropdown>
-    <button id="dropdownConfig" ngbDropdownToggle type="button" class="dropdown-button dropdown-toggle"
-            data-toggle="dropdown" aria-haspopup="true"
-            aria-expanded="false">
-      <img id="profile-picture" src="{{imageUrl}}" alt="profile_picture"/>
-    </button>
+    <div class="icon-wrapper">
+
+      <i-bs [ngStyle]="{'color':changeColorOnStatus(isActive)}" class="active-icon" name="circle-fill"></i-bs>
+      <button id="dropdownConfig" ngbDropdownToggle type="button" class="dropdown-button dropdown-toggle"
+              data-toggle="dropdown" aria-haspopup="true"
+              aria-expanded="false">
+
+        <img id="profile-picture" src="{{imageUrl}}" alt="profile_picture"/>
+      </button>
+    </div>
+
     <div ngbDropdownMenu aria-labelledby="dropdownConfig" class="dropdown-menu">
       <button (click)="getClientToSettings()" class="dropdown-item" type="button">Account Settings</button>
-      <button class="dropdown-item" type="button">none</button>
+      <button  (click)="onActiveStatusChange()" class="dropdown-item" type="button">Change Status to {{isActive?'inactive':'active'}}</button>
       <button (click)="signOut()" class="dropdown-item" type="button">Sign out</button>
     </div>
   </div>
-
+  <div class="navbar-nav ml-lg-2">
+    <p style="color: white; border: 1px solid white">Last logon at: {{lastLogOn}}, Active: {{isActive}}</p>
+  </div>
   <form class="navbar-nav ml-auto">
     <input id="search" type="search" placeholder="Search for people..." aria-label="Search">
     <button id="search-button" type="submit">Search</button>
   </form>
+
+
+
 </div>
 
 <div class="main-container">

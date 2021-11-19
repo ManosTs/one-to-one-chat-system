@@ -1,18 +1,37 @@
 <body>
-<div class="profile-card">
-  <div class="custom-container">
-
-    <div class="client-details">
-      <img class="profile-picture" src="{{url}}" alt="profile_picture"/>
-
-      <div class="name-div">
-        <p *ngIf="first_name">{{first_name}} {{last_name}}</p>
-      </div>
+<div class="pModal" *ngIf="opened">
+  <div class="pModal-content">
+    <button class="close" (click)="open()" type="button">
+      <i-bs class="x-icon" name="x-circle"></i-bs>
+    </button>
+    <div class="image-container">
+      <img class="pModal-profile-picture" src="{{getNewImageData ? getNewImageData : url  }}" alt="profile_picture"/>
+      <p *ngIf="fileError" class="errors">
+        {{fileError}}
+      </p>
+      <form method="post" enctype="multipart/form-data">
+        <input (change)="onFileChanged($event)"
+               style="color: white;"
+               type="file"
+               id="uploadImage"
+               name="image"
+               accept="image/png, image/jpeg"
+        />
+      </form>
+      <button class="add-photo-button" type="button"
+              (click)="uploadFile()">{{loading ? "Uploading..." : "Upload Photo"}}</button>
     </div>
 
-    <!--    <div class="email-div">-->
-    <!--      <p *ngIf="email">Email: {{email}}</p>-->
-    <!--    </div>-->
   </div>
+</div>
+
+<div class="profile-card">
+  <button (click)="open()" type="button" class="profile-pic-button">
+    <img class="profile-picture" src="{{url}}" alt="profile_picture"/>
+  </button>
+  <div class="name-div">
+    <p *ngIf="first_name">{{first_name}} {{last_name}}</p>
+  </div>
+
 </div>
 </body>

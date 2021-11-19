@@ -7,7 +7,24 @@ import { LoginFormComponent } from './authComponets/login-form/login-form.compon
 import { RegisterFormComponent } from './authComponets/register-form/register-form.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import {RouterModule, Routes} from "@angular/router";
-import {chat,xOctagonFill,arrowReturnRight,chevronDoubleRight,personCircle,xSquare,person,eye, eyeSlash,envelope,key,check2,list ,NgxBootstrapIconsModule} from 'ngx-bootstrap-icons';
+import {
+  circleFill,
+  chat,
+  xOctagonFill,
+  arrowReturnRight,
+  chevronDoubleRight,
+  personCircle,
+  xSquare,
+  person,
+  eye,
+  eyeSlash,
+  envelope,
+  key,
+  check2,
+  list,
+  NgxBootstrapIconsModule,
+  xCircle
+} from 'ngx-bootstrap-icons';
 import {FormsModule} from "@angular/forms";
 import {HttpClientModule} from "@angular/common/http";
 import { HomePageComponent } from './pageComponents/home-page/home-page.component';
@@ -15,6 +32,7 @@ import {AuthGuardService} from "./services/routerGuard/auth-guard.service";
 import {AuthService} from "./services/routerGuard/auth.service";
 import {JWT_OPTIONS, JwtHelperService} from "@auth0/angular-jwt";
 import { ClientAccountSettingsComponent } from './pageComponents/client-account-settings/client-account-settings.component';
+import {DatePipe} from "@angular/common";
 
 const icons = {
   eye,
@@ -29,7 +47,9 @@ const icons = {
   chevronDoubleRight,
   arrowReturnRight,
   xOctagonFill,
-  chat
+  chat,
+  circleFill,
+  xCircle
 };
 
 const appRoutes: Routes = [
@@ -82,7 +102,8 @@ const appRoutes: Routes = [
   ],
   providers: [AuthGuardService,AuthService,
     { provide: JWT_OPTIONS, useValue: JWT_OPTIONS },
-    JwtHelperService
+    JwtHelperService,
+    DatePipe
   ],
   bootstrap: [AppComponent]
 })

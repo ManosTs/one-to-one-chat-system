@@ -2,8 +2,6 @@
 <div class="register-card">
   <p class="register-sign">Register</p>
   <form>
-    <div class="row">
-      <div class="col">
         <div class="custom-container">
 
           <p *ngIf="emailError" class="errors">
@@ -78,28 +76,6 @@
           </div>
 
         </div>
-      </div>
-
-      <div class="col-sm-5">
-        <div class="image-container">
-          <p *ngIf="fileError" class="errors">
-            {{fileError}}
-          </p>
-          <form method="post" enctype="multipart/form-data">
-            <label style="color: white;margin-right: 10px"
-                   for="uploadImage">{{message ? message : 'Your Photo: ' }}</label>
-            <input (change)="onFileChanged($event)"
-                   style="color: white"
-                   type="file"
-                   id="uploadImage"
-                   name="image"
-                   accept="image/png, image/jpeg"
-            />
-          </form>
-          <img *ngIf="url" alt="uploaded_pic" class="profile-picture" src="{{url}}"/>
-        </div>
-      </div>
-    </div>
     <button class="register-button"
             (click)="onSubmit()"
             type="button"

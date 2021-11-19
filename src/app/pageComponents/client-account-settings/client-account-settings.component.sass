@@ -1,40 +1,110 @@
+@import "node_modules/bootstrap/scss/bootstrap.scss"
+
 $primary: rgb(255, 255, 255)
 $secondary: rgb(56, 52, 55)
 
 .profile-card
-  position: fixed
-  top: 50%
-  left: 50%
-  transform: translate(-50%, -50%)
+  @extend .container-fluid
   border: none
-  border-radius: 0px
+  border-radius: 0
   background-color: $secondary
-  width: 100%
-  min-height: 60%
   text-align: left
-  padding-top: 10px
   overflow: hidden
 
 .profile-picture
-  width: 20%
+  width: 100px
+  height: 100px
+  border-radius: 50%
   background: $primary
 
-.client-details
-  background: none
-  text-align: left
-  font-size: 1.4em
-
 .name-div
+  font-size: 1.3em
   color: $primary
   background: none
-  margin-bottom: 5px
 
 .email-div
   color: $primary
   background: none
   margin-bottom: 5px
 
-.custom-container
+.image-container
+  color: white
+  margin-top: 10px
+  overflow: hidden
+
+.profile-pic-button
+  background: none
+  border: none
+  outline: none
+  box-shadow: none
+
+.pModal
+  position: fixed
+  z-index: 1 /* Sit on top */
+  left: 0
+  top: 0
   width: 100%
-  padding: 10px 10px 10px
+  overflow: auto
+  height: 100%
+  color: white
+  background-color: rgb(0,0,0) /* Fallback color */
+  background-color: rgba(0,0,0,0.4) /* Black w/ opacity */
+
+.pModal-content
+  @extend .container-sm
   background-color: $secondary
+  margin: 10% auto /* 15% from the top and centered */
+  width: 50% /* Could be more or less, depending on screen size */
+  height: 50%
+  max-height: 100%
+  text-align: center
+  float: none
+  overflow: auto
+
+.pModal-profile-picture
+  width: 150px
+  height: 150px
+  border-radius: 50%
+  background: $primary
+  float: none
+
+.close
+  display: flex
+  float: right
+  outline: none
+  border: none
+  box-shadow: none
+  background: none
+  margin-bottom: 60px
+  margin-right: 5px
+
+
+.x-icon
+  color: red
+
+.x-icon:hover
+  outline: none
+  border: none
+  box-shadow: none
+
+.add-photo-button
+  border-radius: 25px
+  background-color: $primary
+  outline: none
+  border-style: none
+  font-size: 0.9em
+  box-shadow: none
+  color: $secondary
+  width: 20%
+  padding-top: 5px
+  padding-bottom: 5px
+  margin-top: 20px
+  overflow: hidden
+  @media screen and (max-width: 700px)
+    width: 50%
+
+.add-photo-button:hover
+  border: 1px solid white
+  background-color: $secondary
+  color: $primary
+  outline: none
