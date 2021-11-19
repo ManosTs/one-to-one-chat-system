@@ -1,10 +1,10 @@
 package com.mainproject.outlinevisionv2.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.hibernate.type.BlobType;
 
 import javax.persistence.*;
-import java.sql.Blob;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -32,8 +32,18 @@ public class Client {
     @Column(name = "token", nullable = false,length = 1000)
     private String token;
 
-    @Column(name = "file_name", nullable = false)
-    private String fileName;
+    @Column(name = "file_id", nullable = true)
+    private String fileID;
+
+    @Column(name = "active_status", nullable = false)
+    private Boolean isActive = false;
+
+    @Column(name= "last_logout", nullable = true)
+    private Date last_logout;
+
+    @Column(name= "last_logon", nullable = true)
+    private Date last_logon ;
+
 
     @ManyToMany(cascade = CascadeType.ALL,fetch=FetchType.EAGER)
     @JoinTable(
@@ -87,8 +97,20 @@ public class Client {
         this.file = file;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    public void setActive(Boolean active) {
+        isActive = active;
+    }
+
+    public void setLast_logout(Date last_logout) {
+        this.last_logout = last_logout;
+    }
+
+    public void setLast_logon(Date last_logon) {
+        this.last_logon = last_logon;
+    }
+
+    public void setFileID(String fileID) {
+        this.fileID = fileID;
     }
 
     //-----------------------------------------//
@@ -126,7 +148,19 @@ public class Client {
         return file;
     }
 
-    public String getFileName() {
-        return fileName;
+    public Boolean getActive() {
+        return isActive;
+    }
+
+    public Date getLast_logout() {
+        return last_logout;
+    }
+
+    public Date getLast_logon() {
+        return last_logon;
+    }
+
+    public String getFileID() {
+        return fileID;
     }
 }

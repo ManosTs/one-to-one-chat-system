@@ -9,27 +9,15 @@ import com.mainproject.outlinevisionv2.repository.FileRepository;
 import com.mainproject.outlinevisionv2.security.EncodingPassword;
 import com.mainproject.outlinevisionv2.security.jwtSecuritiy.JWTBuilder;
 import com.mainproject.outlinevisionv2.service.FileService;
-import org.hibernate.loader.plan.exec.process.spi.ResultSetProcessingContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpCookie;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.view.RedirectView;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 @CrossOrigin(origins = "http://192.168.1.2:4200",exposedHeaders ="Authorization")
 @RestController
@@ -86,9 +74,6 @@ public class ClientController {
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body(existsClient);
         }
 
-        File file = fileRepository.findFileByName(client.getFileName());
-        client.addFile(file);
-
         //set encrypted password to client
         String hashedPass = EncodingPassword.passwordEncoder(client.getPassword());
         client.setPassword(hashedPass);
@@ -108,7 +93,7 @@ public class ClientController {
     }
 
     @PostMapping(value = "/login")
-    public ResponseEntity<?> loginClient(@RequestBody Client client,HttpServletResponse response){
+    public ResponseEntity<?> loginClient(@RequestBody Client client){
         Client clientFound = clientRepository.findClientByEmail(client.getEmail());
 
         //if client is not found return not found status
@@ -122,9 +107,68 @@ public class ClientController {
         }
         //else return 200 OK status and add custom header "Authorization" to retrieve token for client side
         String access_token = clientFound.getToken();
-        return ResponseEntity.ok().header("Authorization",access_token).body(clientFound);
+
+        clientFound.setActive(true);
+        clientFound.setLast_logon(new Date());
+        Client savedClient = clientRepository.save(clientFound);
+        return ResponseEntity.ok().header("Authorization",access_token).body(savedClient);
     }
 
+    @GetMapping(value = "/logout/{id}")
+    public ResponseEntity<?> logoutClient(@PathVariable String id){
+        Client clientFound = clientRepository.findClientById(id);
 
+        clientFound.setActive(false);
 
+        clientFound.setLast_logout(new Date());
+
+        Client savedClient = clientRepository.save(clientFound);
+
+        return ResponseEntity.ok().body(savedClient.getActive());
+    }
+
+    @GetMapping(value = "/isActive/{id}")
+    public ResponseEntity<?> isClientActive(@PathVariable String id){
+        Client clientFound = clientRepository.findClientById(id);
+
+        return ResponseEntity.ok().body(clientFound.getActive());
+    }
+
+    @GetMapping(value = "/{id}/status={status}")
+    public ResponseEntity<?> changeStatus(@PathVariable String id, @PathVariable("status") Boolean status){
+        Client clientFound = clientRepository.findClientById(id);
+
+        if(!status){
+            clientFound.setActive(false);
+            Client savedClient = clientRepository.save(clientFound);
+            return ResponseEntity.ok().body(savedClient.getActive());
+        }
+        clientFound.setActive(true);
+
+        Client savedClient = clientRepository.save(clientFound);
+
+        return ResponseEntity.ok().body(savedClient.getActive());
+    }
+
+    @GetMapping(value = "/{id}/lastSeen")
+    public ResponseEntity<?> lastSeen(@PathVariable String id) {
+        Client clientFound = clientRepository.findClientById(id);
+
+        Date date1 = clientFound.getLast_logon();
+        Date date2 = clientFound.getLast_logout();
+
+        long diff = date2.getTime() - date1.getTime();
+
+        long diffInMinutes = diff / (60 * 1000) % 60;
+
+        return ResponseEntity.ok().body(diffInMinutes + " min(s)");
+    }
+
+    @GetMapping(value = "/{id}/lastLogon")
+    public ResponseEntity<?> lastLogon(@PathVariable String id) {
+        Client clientFound = clientRepository.findClientById(id);
+
+        return ResponseEntity.ok().body(clientFound.getLast_logon());
+
+    }
 }

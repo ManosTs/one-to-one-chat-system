@@ -1,6 +1,7 @@
 package com.mainproject.outlinevisionv2.service;
 
 import com.mainproject.outlinevisionv2.entity.File;
+import com.mainproject.outlinevisionv2.repository.ClientRepository;
 import com.mainproject.outlinevisionv2.repository.FileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -8,6 +9,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 @Service
@@ -17,6 +19,13 @@ public class FileService {
     @Autowired
     public void setFileRepository(FileRepository fileRepository) {
         this.fileRepository = fileRepository;
+    }
+
+    private ClientRepository clientRepository;
+
+    @Autowired
+    public void setClientRepository(ClientRepository clientRepository) {
+        this.clientRepository = clientRepository;
     }
 
     public File storeFile(MultipartFile file) throws IOException{

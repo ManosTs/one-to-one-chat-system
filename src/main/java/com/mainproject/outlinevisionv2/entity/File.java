@@ -7,20 +7,20 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-@CrossOrigin(origins = "http://192.168.1.3:4200")
+@CrossOrigin(origins = "http://192.168.1.2:4200")
 @Entity
 @Table(name = "files")
 public class File{
     @Id
     private String id = UUID.randomUUID().toString();
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name")
     private String name;
 
-    @Column(name = "type", nullable = false)
+    @Column(name = "type")
     private String type;
 
-    @Column(name = "data", nullable = false)
+    @Column(name = "data")
     @Lob
     private byte[] data;
 

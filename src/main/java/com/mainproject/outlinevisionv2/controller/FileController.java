@@ -1,6 +1,8 @@
 package com.mainproject.outlinevisionv2.controller;
 
+import com.mainproject.outlinevisionv2.entity.Client;
 import com.mainproject.outlinevisionv2.entity.File;
+import com.mainproject.outlinevisionv2.repository.ClientRepository;
 import com.mainproject.outlinevisionv2.repository.FileRepository;
 import com.mainproject.outlinevisionv2.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +23,36 @@ public class FileController {
         this.fileService = fileService;
     }
 
-    @PostMapping(value = "/upload")
-    public ResponseEntity uploadFile(@RequestParam("file") MultipartFile file){
-        String message = "";
+    private ClientRepository clientRepository;
 
+    @Autowired
+    public void setClientRepository(ClientRepository clientRepository) {
+        this.clientRepository = clientRepository;
+    }
+
+    private FileRepository fileRepository;
+
+    @Autowired
+    public void setFileRepository(FileRepository fileRepository) {
+        this.fileRepository = fileRepository;
+    }
+
+    @PostMapping(value = "/upload/id={id}")
+    public ResponseEntity uploadFile(@RequestParam("file") MultipartFile file, @PathVariable String id){
+        String message = "";
+        Client clientFound = clientRepository.findClientById(id);
         try {
+            if(clientFound.getFileID()!=null){
+                fileRepository.deleteById(clientFound.getFileID());
+            }
+
             File savedFile =  fileService.storeFile(file);
+
+            clientFound.addFile(savedFile);
+            clientFound.setFileID(savedFile.getId());
+
+            clientRepository.save(clientFound);
+
             return ResponseEntity.ok().body(savedFile);
         }catch (Exception e){
             message = "Could not upload the file: " + file.getOriginalFilename() + "!";
@@ -34,9 +60,10 @@ public class FileController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/client-id={id}")
     public ResponseEntity getFile(@PathVariable String id){
-        File file = fileService.getFile(id);
+        Client clientFound = clientRepository.findClientById(id);
+        File file = fileService.getFile(clientFound.getFileID());
         String s = Base64.getEncoder().encodeToString(file.getData());
         return ResponseEntity.ok().header("File-Data", s).body(file);
     }

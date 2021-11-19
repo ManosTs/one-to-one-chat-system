@@ -1,28 +1,15 @@
 package com.mainproject.outlinevisionv2.security.jwtSecuritiy;
 
-import com.mainproject.outlinevisionv2.entity.Authority;
 import com.mainproject.outlinevisionv2.entity.Client;
+import com.mainproject.outlinevisionv2.entity.File;
 import com.mainproject.outlinevisionv2.repository.ClientRepository;
 import io.jsonwebtoken.*;
-import org.assertj.core.api.junit.jupiter.InjectSoftAssertions;
-import org.hibernate.service.spi.InjectService;
-import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import java.text.Normalizer;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
 
 
 @Component
@@ -48,6 +35,7 @@ public class JWTBuilder {
 
     //build and generate token
     private String buildToken(Client client) {
+
         return Jwts
                 .builder()
                 .setIssuer("outline-vision")
@@ -55,12 +43,22 @@ public class JWTBuilder {
                 .setId(UUID.randomUUID().toString())
                 .setExpiration(expirationDate)
                 .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
-                .claim("client_id",client.getId())
-                .claim("first_name", client.getFirstName())
-                .claim("last_name", client.getLastName())
-                .claim("profile_picture",client.getFile().getId())
-                .claim("authority", client.getAuthorities())
+                .setClaims(claims(client))
                 .compact();
+    }
+
+    private Map<String, Object> claims(Client client){
+        Map<String, Object> claims = new HashMap<>();
+
+        claims.put("client_id",client.getId());
+        claims.put("first_name", client.getFirstName());
+        claims.put("last_name", client.getLastName());
+        claims.put("authority", client.getAuthorities());
+        claims.put("last_logon", client.getLast_logon());
+        claims.put("last_logout", client.getLast_logout());
+        claims.put("active_status", client.getActive());
+
+        return claims;
     }
 
     public String generateToken(Client client) {
