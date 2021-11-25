@@ -10,6 +10,7 @@ import com.mainproject.outlinevisionv2.security.EncodingPassword;
 import com.mainproject.outlinevisionv2.security.jwtSecuritiy.JWTBuilder;
 import com.mainproject.outlinevisionv2.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -52,16 +53,18 @@ public class ClientController {
         this.clientRepository = clientRepository;
     }
 
-    @GetMapping()
-    public List<Client> getClients(){
-        return clientRepository.findAll();
-    }
-
     private JWTBuilder jwtBuilder;
 
     @Autowired
     public void setJwtBuilder(JWTBuilder jwtBuilder) {
         this.jwtBuilder = jwtBuilder;
+    }
+    //-----------------------------------------------------------------------------------------------------------------//
+
+    @GetMapping(value = "/all")
+    public ResponseEntity<?> getClientsByFirstName(){
+        List<Object[]> clientsList = clientRepository.findAllGroupByFirstName();
+        return ResponseEntity.ok().body(clientsList);
     }
 
     @PostMapping(value = "/register")
@@ -77,7 +80,6 @@ public class ClientController {
         //set encrypted password to client
         String hashedPass = EncodingPassword.passwordEncoder(client.getPassword());
         client.setPassword(hashedPass);
-
         //add authority(each registered client has user authority as default)
         Authority userAuthority = authorityRepository.findAuthorityByName("user");
         client.addAuthority(userAuthority);
@@ -114,8 +116,8 @@ public class ClientController {
         return ResponseEntity.ok().header("Authorization",access_token).body(savedClient);
     }
 
-    @GetMapping(value = "/logout/{id}")
-    public ResponseEntity<?> logoutClient(@PathVariable String id){
+    @GetMapping(value = "/logout")
+    public ResponseEntity<?> logoutClient(@RequestParam("id") String id){
         Client clientFound = clientRepository.findClientById(id);
 
         clientFound.setActive(false);

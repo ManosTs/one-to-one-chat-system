@@ -6,8 +6,14 @@ import com.mainproject.outlinevisionv2.repository.ClientRepository;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.codec.Hex;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.util.*;
 
@@ -26,11 +32,8 @@ public class JWTBuilder {
 
     private final String SECRET_KEY;
 
-
-
-    public JWTBuilder(@Value("${jwt.secret}") String key){
+    public JWTBuilder(@Value("${jwt.secret}") String key) {
         this.SECRET_KEY = key;
-
     }
 
     //build and generate token
@@ -39,18 +42,30 @@ public class JWTBuilder {
         return Jwts
                 .builder()
                 .setIssuer("outline-vision")
-                .setSubject(client.getEmail())
                 .setId(UUID.randomUUID().toString())
-                .setExpiration(expirationDate)
-                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
+                .signWith(SignatureAlgorithm.HS512, hexToString(SECRET_KEY))
                 .setClaims(claims(client))
+                .setSubject(client.getEmail())
+                .setExpiration(expirationDate)
                 .compact();
     }
 
-    private Map<String, Object> claims(Client client){
+    private String hexToString(String hexString) {
+        ByteBuffer buff = ByteBuffer.allocate(hexString.length() / 2);
+        for (int i = 0; i < hexString.length(); i += 2) {
+            buff.put((byte) Integer.parseInt(hexString.substring(i, i + 2), 16));
+        }
+        buff.rewind();
+        Charset cs = StandardCharsets.UTF_8;
+        CharBuffer cb = cs.decode(buff);
+
+        return cb.toString();
+    }
+
+    private Map<String, Object> claims(Client client) {
         Map<String, Object> claims = new HashMap<>();
 
-        claims.put("client_id",client.getId());
+        claims.put("client_id", client.getId());
         claims.put("first_name", client.getFirstName());
         claims.put("last_name", client.getLastName());
         claims.put("authority", client.getAuthorities());
@@ -71,7 +86,7 @@ public class JWTBuilder {
         //get the right claims from Jws body
         Jws<Claims> claimsJws = Jwts
                 .parser()
-                .setSigningKey(SECRET_KEY)
+                .setSigningKey(hexToString(SECRET_KEY))
                 .parseClaimsJws(token);
         //return true if Jwt token is expired
         return claimsJws
@@ -88,23 +103,25 @@ public class JWTBuilder {
         //get the right claims from Jws body
         Jws<Claims> claimsJws = Jwts
                 .parser()
-                .setSigningKey(SECRET_KEY)
+                .setSigningKey(hexToString(SECRET_KEY))
                 .parseClaimsJws(token);
 
         return (
                 (
                         client.getEmail()
                                 .equals(claimsJws.getBody().getSubject())
-                )&&
+                ) &&
                         !isTokenExpired(token)
         );
     }
+
     //-----------------------------------------------------------------------------------------//
-    public  String getEmailFromToken(String token){
-        Jws<Claims> claimsJws = Jwts
+    public String getEmailFromToken(String token) {
+        return Jwts
                 .parser()
-                .setSigningKey(SECRET_KEY)
-                .parseClaimsJws(token);
-        return claimsJws.getBody().getSubject();
+                .setSigningKey(hexToString(SECRET_KEY))
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
 }

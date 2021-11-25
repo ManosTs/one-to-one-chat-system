@@ -51,7 +51,7 @@ public class JwtFilter extends OncePerRequestFilter {
             } catch (ExpiredJwtException e) {
                 System.out.println("JWT Token has expired");
             }
-        }
+        }else logger.warn("Token must start with Bearer");
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
@@ -60,7 +60,6 @@ public class JwtFilter extends OncePerRequestFilter {
             // if token is valid configure Spring Security to manually set
             // authentication
             if (jwtBuilder.verifyToken(token)) {
-
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                         client, null, client.getAuthorities());
                 usernamePasswordAuthenticationToken
