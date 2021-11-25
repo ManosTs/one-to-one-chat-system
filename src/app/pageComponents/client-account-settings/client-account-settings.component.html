@@ -1,9 +1,6 @@
 <body>
 <div class="pModal" *ngIf="opened">
   <div class="pModal-content">
-    <button class="close" (click)="open()" type="button">
-      <i-bs class="x-icon" name="x-circle"></i-bs>
-    </button>
     <div class="image-container">
       <img class="pModal-profile-picture" src="{{getNewImageData ? getNewImageData : url  }}" alt="profile_picture"/>
       <p *ngIf="fileError" class="errors">
@@ -19,7 +16,11 @@
         />
       </form>
       <button class="add-photo-button" type="button"
-              (click)="uploadFile()">{{loading ? "Uploading..." : "Upload Photo"}}</button>
+              (click)="uploadFile()">{{loading ? "Uploading..." : "Upload Photo"}}</button><br/>
+
+      <button class="cancel-button" (click)="open()" type="button">
+        Cancel
+      </button>
     </div>
 
   </div>
@@ -32,6 +33,5 @@
   <div class="name-div">
     <p *ngIf="first_name">{{first_name}} {{last_name}}</p>
   </div>
-
 </div>
 </body>

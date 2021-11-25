@@ -5,6 +5,8 @@ import {HttpClient} from "@angular/common/http";
 import {HttpClientService} from "../../services/client/http-client.service";
 import {FileUploadService} from "../../services/client/file-upload.service";
 import {NgbActiveModal, NgbModal} from "@ng-bootstrap/ng-bootstrap";
+import {ActivatedRoute, Router} from "@angular/router";
+import {query} from "@angular/animations";
 
 
 @Component({
@@ -31,17 +33,22 @@ export class ClientAccountSettingsComponent implements OnInit {
   private decodedToken : any = this.jwtHelper.decodeToken(this.cookieService.get("token"))
   public url: any;
 
+  public retrieveIdFromURI: string = "";
+
   constructor(private httpFile:FileUploadService,
               private jwtHelper: JwtHelperService,private cookieService : CookieService,
-              private httpClientService: HttpClientService) { }
+              private httpClientService: HttpClientService,
+              private route: ActivatedRoute) { }
 
   ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      this.retrieveIdFromURI = params['id'];
+    });
     this.first_name = `${(this.decodedToken)['first_name']}`
     this.last_name = `${(this.decodedToken)['last_name']}`
     this.email = `${(this.decodedToken)['sub']}`
     this.url = "https://az-pe.com/wp-content/uploads/2018/05/blank-profile-picture-973460_960_720-200x200.png"
     this.getClientProfilePhoto()
-    console.warn((this.decodedToken)['profile_picture'])
   }
 
   getClientProfilePhoto(){
@@ -90,6 +97,7 @@ export class ClientAccountSettingsComponent implements OnInit {
       (event:any) =>{
         if(typeof (event) === "object"){
           this.loading = false
+          this.opened = false
         }
       },
       error => {

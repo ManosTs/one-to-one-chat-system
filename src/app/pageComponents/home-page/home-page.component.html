@@ -15,7 +15,8 @@
 
     <div ngbDropdownMenu aria-labelledby="dropdownConfig" class="dropdown-menu">
       <button (click)="getClientToSettings()" class="dropdown-item" type="button">Account Settings</button>
-      <button  (click)="onActiveStatusChange()" class="dropdown-item" type="button">Change Status to {{isActive?'inactive':'active'}}</button>
+      <button (click)="onActiveStatusChange()" class="dropdown-item" type="button">Change Status
+        to {{isActive ? 'inactive' : 'active'}}</button>
       <button (click)="signOut()" class="dropdown-item" type="button">Sign out</button>
     </div>
   </div>
@@ -23,12 +24,15 @@
     <p style="color: white; border: 1px solid white">Last logon at: {{lastLogOn}}, Active: {{isActive}}</p>
   </div>
   <form class="navbar-nav ml-auto">
-    <input id="search" type="search" placeholder="Search for people..." aria-label="Search">
-    <button id="search-button" type="submit">Search</button>
+    <input  id="search"
+           placeholder="Search people..."
+           name="search"
+           type = "text"
+           [(ngModel)]="searchPeople"
+            autofocus
+    />
+      <button (click)="getAllClientsByFirstName()" id="search-button" type="submit">Search</button>
   </form>
-
-
-
 </div>
 
 <div class="main-container">

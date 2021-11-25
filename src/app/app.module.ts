@@ -6,7 +6,7 @@ import { AppComponent } from './app.component';
 import { LoginFormComponent } from './authComponets/login-form/login-form.component';
 import { RegisterFormComponent } from './authComponets/register-form/register-form.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import {RouterModule, Routes} from "@angular/router";
+import {ActivatedRouteSnapshot, RouterModule, Routes} from "@angular/router";
 import {
   circleFill,
   chat,
@@ -26,7 +26,7 @@ import {
   xCircle
 } from 'ngx-bootstrap-icons';
 import {FormsModule} from "@angular/forms";
-import {HttpClientModule} from "@angular/common/http";
+import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
 import { HomePageComponent } from './pageComponents/home-page/home-page.component';
 import {AuthGuardService} from "./services/routerGuard/auth-guard.service";
 import {AuthService} from "./services/routerGuard/auth.service";
@@ -66,6 +66,10 @@ const appRoutes: Routes = [
     path: 'login',
     component: LoginFormComponent
   },
+  {
+    path: 'logout',
+    component: LoginFormComponent
+  },
 
   {
     path: 'home',
@@ -73,7 +77,7 @@ const appRoutes: Routes = [
     canActivate: [AuthGuardService]
   },
   {
-    path: 'settings/id/:id',
+    path: 'settings',
     component: ClientAccountSettingsComponent,
     canActivate: [AuthGuardService]
   }
@@ -98,7 +102,7 @@ const appRoutes: Routes = [
     NgbModule,
     NgxBootstrapIconsModule.pick(icons),
     FormsModule,
-    HttpClientModule
+    HttpClientModule,
   ],
   providers: [AuthGuardService,AuthService,
     { provide: JWT_OPTIONS, useValue: JWT_OPTIONS },

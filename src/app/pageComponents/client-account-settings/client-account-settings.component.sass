@@ -68,16 +68,27 @@ $secondary: rgb(56, 52, 55)
   background: $primary
   float: none
 
-.close
-  display: flex
-  float: right
+.cancel-button
+  border-radius: 25px
+  background-color: $primary
   outline: none
-  border: none
+  border-style: none
+  font-size: 0.9em
   box-shadow: none
-  background: none
-  margin-bottom: 60px
-  margin-right: 5px
+  color: $secondary
+  width: 20%
+  padding-top: 5px
+  padding-bottom: 5px
+  overflow: hidden
+  margin-top: 10px
+  @media screen and (max-width: 700px)
+    width: 50%
 
+.cancel-button:hover
+  border: 1px solid white
+  background-color: $secondary
+  color: $primary
+  outline: none
 
 .x-icon
   color: red
@@ -98,7 +109,7 @@ $secondary: rgb(56, 52, 55)
   width: 20%
   padding-top: 5px
   padding-bottom: 5px
-  margin-top: 20px
+  margin-top: 15px
   overflow: hidden
   @media screen and (max-width: 700px)
     width: 50%

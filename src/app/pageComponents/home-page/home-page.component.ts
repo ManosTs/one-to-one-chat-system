@@ -2,11 +2,13 @@ import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {HomePageService} from "../../services/page/homePage/home-page.service";
 import {CookieService} from "ngx-cookie-service";
 import {JwtHelperService} from "@auth0/angular-jwt";
-import {Router} from "@angular/router";
+import {ActivatedRoute, ActivatedRouteSnapshot, Router} from "@angular/router";
 import {FileUploadService} from "../../services/client/file-upload.service";
 import {WebSocketService} from "../../services/message/web-socket.service";
 import {HttpClientService} from "../../services/client/http-client.service";
 import {DatePipe} from "@angular/common";
+import {LoginFormComponent} from "../../authComponets/login-form/login-form.component";
+import {HttpParams} from "@angular/common/http";
 
 @Component({
   selector: 'app-home-page',
@@ -22,12 +24,18 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   public isActive: boolean = false;
   public lastLogOn: any;
 
+  public token:any;
+
+  public searchPeople = "";
+
   colors = [{status: true, color: "green"}, {status: false, color: "grey"}]
+  public clientsList:any = [];
 
   constructor(private httpHomePageService: HomePageService,
               private cookieService: CookieService,
               private jwtHelper: JwtHelperService,
               private router: Router,
+              private route: ActivatedRoute,
               private http: FileUploadService,
               public webSocket: WebSocketService,
               private httpClient: HttpClientService,
@@ -35,18 +43,39 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   }
 
   //decode Token to retrieve info from user
-  private decodedToken: any = this.jwtHelper.decodeToken(this.cookieService.get("token"));
+  private decodedToken: any;
 
   //---------------------------------------------------------------------------------------//
 
   ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      this.token = params["access_token"];
+      this.httpHomePageService.getAccessToHomePage(this.token).subscribe(res => {
+        console.log(res)
+      },
+        error => {
+        console.log(error)
+        }
+      );
+      if(this.token === null){
+        this.disconnect()
+      }
+    })
+    this.decodedToken = this.jwtHelper.decodeToken(this.token);
+    this.router.navigate(['/home'])
     this.connect()
+
     this.lastLogon()
+
     this.isUserActive()
+
     this.fullName = (this.decodedToken)["first_name"] + " " + (this.decodedToken)["last_name"]
+
     this.imageUrl = "https://az-pe.com/wp-content/uploads/2018/05/blank-profile-picture-973460_960_720-200x200.png"
+
     this.getClientProfilePhoto()
 
+    console.log(this.getAllClientsByFirstName())
   }
 
   changeColorOnStatus(status: any) {
@@ -95,28 +124,28 @@ export class HomePageComponent implements OnInit, AfterViewInit {
       }
     );
   }
-
   //sign out user
   signOut() {
     this.httpClient.logoutUser((this.decodedToken)["client_id"]).subscribe(
-      data => {
-
+      res => {
+        this.cookieService.delete("token");
+        window.localStorage.removeItem("token");
+        this.disconnect();
+        this.router.navigate(["/logout"], {queryParams: {id: (this.decodedToken)["client_id"]}, queryParamsHandling: "merge"}).then(res =>{
+        })
       },
       error => {
         console.log(error);
       }
     );
-    this.cookieService.delete("token");
-    this.disconnect();
-    window.localStorage.removeItem("token");
-    window.location.reload();
+
   }
 
   //-----------------------------------------------//
 
   //navigate user to settings page
   getClientToSettings() {
-    this.router.navigate(['/settings/id/', `${(this.decodedToken)['client_id']}`]);
+    this.router.navigate(['/settings'],{queryParams: {id: (this.decodedToken)['client_id']},queryParamsHandling: ""});
   }
 
   //----------------------------------------------------------------------------------------//
@@ -175,4 +204,15 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   //-------------------------------------------------------------------------------------------//
 
 
+  getAllClientsByFirstName() :any{
+    this.httpClient.getAllClients().subscribe(
+      data=>{
+        if(data){
+          this.clientsList = data.body;
+        }
+      },error => {
+        console.log(error)
+      }
+    )
+  }
 }

@@ -6,6 +6,7 @@ import {check, wind} from "ngx-bootstrap-icons";
 import {map, tap} from "rxjs/operators";
 import {JwtHelperService} from "@auth0/angular-jwt";
 import {FileUploadService} from "../../services/client/file-upload.service";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-login-form',
@@ -14,7 +15,7 @@ import {FileUploadService} from "../../services/client/file-upload.service";
 })
 export class LoginFormComponent implements OnInit {
 
-  public url:any
+  public url: any
 
 
   public loading: boolean = false;
@@ -30,7 +31,7 @@ export class LoginFormComponent implements OnInit {
 
   public passwordError: string = '';
 
-  @ViewChild("passwordInput", { static: false }) passwordInput: ElementRef<HTMLInputElement> = {} as ElementRef;
+  @ViewChild("passwordInput", {static: false}) passwordInput: ElementRef<HTMLInputElement> = {} as ElementRef;
 
   @Input()
   emailPattern: string | RegExp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
@@ -38,8 +39,9 @@ export class LoginFormComponent implements OnInit {
   user: LoginUser = new LoginUser("", "");
 
   constructor(private httpClientService: HttpClientService, private cookie: CookieService,
-              private jwtHelper:JwtHelperService,
-              private httpFile:FileUploadService) {
+              private jwtHelper: JwtHelperService,
+              private httpFile: FileUploadService,
+              private router: Router) {
 
   }
 
@@ -95,14 +97,20 @@ export class LoginFormComponent implements OnInit {
         (res) => {
           this.user = res;
           this.token = res.headers.get("Authorization")
-
           if (this.token === null) {
             return;
           }
-          this.cookie.set("token", this.token);
           this.rememberMe()
-
-          window.location.href = "/home"
+          this.router.navigate(["/home"],
+            {
+              queryParams:
+                {
+                  access_token: this.token
+                },
+                  queryParamsHandling: "merge"
+            }).then(res => {
+            console.log("Logged in successfully" + res)
+          })
         },
         error => {
           if (error.status === 404) {
@@ -113,12 +121,11 @@ export class LoginFormComponent implements OnInit {
             this.emailError = "ACCESS DENIED, CHECK PASSWORD"
           }
           console.log(error)
-        }
-      )
+        })
     }
   }
 
-  rememberValue(event:any){
+  rememberValue(event: any) {
     this.remember = event.target.checked
   }
 
@@ -132,30 +139,31 @@ export class LoginFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.router.navigate(['login'])
     this.autoCompleteCred()
     this.url = "https://az-pe.com/wp-content/uploads/2018/05/blank-profile-picture-973460_960_720-200x200.png"
   }
 
-  autoCompleteCred(){
+  autoCompleteCred() {
     let token = window.localStorage.getItem("token")
     if (token != null) {
       this.user.email = (this.jwtHelper.decodeToken(token))['sub']
       this.remember = true
-      // this.getClientProfile(token);
+      this.getClientProfile(token);
     }
   }
 
-  // getClientProfile(token:any) {
-  //   token = window.localStorage.getItem("token")
-  //     this.httpFile.getFile((this.jwtHelper.decodeToken(token))['profile_picture']).subscribe(
-  //       data => {
-  //         this.url = "data:image/png;base64," + data.headers.get("File-Data");
-  //       },
-  //       error => {
-  //         console.log(error)
-  //       }
-  //     )
-  //   }
+  getClientProfile(token: any) {
+    token = window.localStorage.getItem("token")
+    this.httpFile.getFile((this.jwtHelper.decodeToken(token))['profile_picture']).subscribe(
+      data => {
+        this.url = "data:image/png;base64," + data.headers.get("File-Data");
+      },
+      error => {
+        console.log(error)
+      }
+    )
+  }
 
   onSubmit() {
     let isFormValid = this.validationForm();

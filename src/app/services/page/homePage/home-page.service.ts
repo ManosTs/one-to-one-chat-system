@@ -6,12 +6,16 @@ import {Observable} from "rxjs";
   providedIn: 'root'
 })
 export class HomePageService {
-  private url = "http://localhost:8080/home/"
+  private url = "http://localhost:8080/home"
   constructor(private httpHomePage: HttpClient) { }
 
 
-  public getSettings(id:String) : Observable<any>{
-    return this.httpHomePage.get<String>(this.url + "settings/" + id );
+  public getAccessToHomePage(token:string) : Observable<any>{
+    return this.httpHomePage.get(this.url,{
+      params: {
+        token: token
+      },
+      observe: 'response'
+    })
   }
-
 }
