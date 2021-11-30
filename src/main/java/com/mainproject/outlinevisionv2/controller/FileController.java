@@ -13,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Base64;
 
 @RestController
-@CrossOrigin(origins = "http://192.168.1.2:4200", exposedHeaders = "File-Data, Authorization")
+@CrossOrigin(origins = "http://192.168.1.5:4200", exposedHeaders = "File-Data, Authorization")
 @RequestMapping(value = "/files", method = RequestMethod.POST)
 public class FileController {
     private FileService fileService;

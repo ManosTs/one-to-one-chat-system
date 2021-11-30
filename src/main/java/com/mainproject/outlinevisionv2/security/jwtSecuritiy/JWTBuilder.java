@@ -1,21 +1,26 @@
 package com.mainproject.outlinevisionv2.security.jwtSecuritiy;
 
 import com.mainproject.outlinevisionv2.entity.Client;
-import com.mainproject.outlinevisionv2.entity.File;
 import com.mainproject.outlinevisionv2.repository.ClientRepository;
-import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.codec.Hex;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.text.ParseException;
 import java.time.ZonedDateTime;
 import java.util.*;
+
+import java.security.interfaces.*;
+
+import com.nimbusds.jose.*;
+import com.nimbusds.jose.crypto.*;
+import com.nimbusds.jwt.*;
 
 
 @Component
@@ -32,96 +37,110 @@ public class JWTBuilder {
 
     private final String SECRET_KEY;
 
-    public JWTBuilder(@Value("${jwt.secret}") String key) {
+    public JWTBuilder(@Value("${jwt.secret}") String key) throws NoSuchAlgorithmException {
         this.SECRET_KEY = key;
     }
 
-    //build and generate token
-    private String buildToken(Client client) {
+    //public and private key generators
+    private final KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+    private final KeyPair pair = keyGen.generateKeyPair();
 
-        return Jwts
-                .builder()
-                .setIssuer("outline-vision")
-                .setId(UUID.randomUUID().toString())
-                .signWith(SignatureAlgorithm.HS512, hexToString(SECRET_KEY))
-                .setClaims(claims(client))
-                .setSubject(client.getEmail())
-                .setExpiration(expirationDate)
-                .compact();
-    }
+    private final RSAPrivateKey privateKey = (RSAPrivateKey) pair.getPrivate();
+    private final RSAPublicKey publicKey = (RSAPublicKey) pair.getPublic();
+    //---------------------------------------------------------------------------//
 
-    private String hexToString(String hexString) {
-        ByteBuffer buff = ByteBuffer.allocate(hexString.length() / 2);
-        for (int i = 0; i < hexString.length(); i += 2) {
-            buff.put((byte) Integer.parseInt(hexString.substring(i, i + 2), 16));
+    // Request JWT encrypted with RSA-OAEP-256 and 128-bit AES/GCM
+    private final JWEHeader header = new JWEHeader(
+            JWEAlgorithm.RSA_OAEP_256,
+            EncryptionMethod.A128GCM
+    );
+
+    private String buildEncryptedToken(Client client) throws JOSEException, ParseException, NoSuchAlgorithmException, IOException, InvalidKeySpecException {
+
+        JWTClaimsSet jwtClaims = new JWTClaimsSet
+                .Builder()
+                .issuer(".outline-vision.com")
+                .jwtID(UUID.randomUUID().toString())
+                //----------------claims------------------------//
+                .claim("client_id", client.getId())
+                .claim("first_name", client.getFirstName())
+                .claim("last_name", client.getLastName())
+                .claim("authority", client.getAuthorities())
+                //------------------------------------------------//
+                .subject(client.getEmail())
+                .expirationTime(expirationDate)
+                .build();
+
+        // Create the encrypted JWT object
+        EncryptedJWT jwt = new EncryptedJWT(header, jwtClaims);
+
+        // Create a rsaEncrypter with the specified public RSA key
+        RSAEncrypter rsaEncrypter = new RSAEncrypter(publicKey);
+
+        // Do the actual encryption
+        jwt.encrypt(rsaEncrypter);
+
+        String jwtString = jwt.serialize();
+
+        //-------------------------------------------------------------------------------//
+
+        //save client's public key to file
+        try (FileOutputStream fos = new FileOutputStream(client.getId()+ "-public.key")) {
+            fos.write(publicKey.getEncoded());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        buff.rewind();
-        Charset cs = StandardCharsets.UTF_8;
-        CharBuffer cb = cs.decode(buff);
 
-        return cb.toString();
+        //------------------------------------------------------------------//
+
+        return jwtString; //returns the encrypted token
     }
 
-    private Map<String, Object> claims(Client client) {
-        Map<String, Object> claims = new HashMap<>();
+    public JWTClaimsSet decodeToken (String jwtString) throws ParseException, JOSEException {
+        EncryptedJWT jwt = EncryptedJWT.parse(jwtString);
+        // Create a rsaDecrypter with the specified private RSA key
+        RSADecrypter rsaDecrypter = new RSADecrypter(privateKey);
 
-        claims.put("client_id", client.getId());
-        claims.put("first_name", client.getFirstName());
-        claims.put("last_name", client.getLastName());
-        claims.put("authority", client.getAuthorities());
-        claims.put("last_logon", client.getLast_logon());
-        claims.put("last_logout", client.getLast_logout());
-        claims.put("active_status", client.getActive());
+        // Decrypt
+        jwt.decrypt(rsaDecrypter);
 
-        return claims;
+        return jwt.getJWTClaimsSet();
     }
 
-    public String generateToken(Client client) {
-        return buildToken(client);
+    public String generateToken(Client client) throws ParseException, NoSuchAlgorithmException, JOSEException, IOException, InvalidKeySpecException {
+        return buildEncryptedToken(client);
     }
     //--------------------------------------------------------------//
 
     //check if token has expired
-    private boolean isTokenExpired(String token) {
+    private boolean isTokenExpired(String token) throws ParseException, JOSEException {
         //get the right claims from Jws body
-        Jws<Claims> claimsJws = Jwts
-                .parser()
-                .setSigningKey(hexToString(SECRET_KEY))
-                .parseClaimsJws(token);
+        JWTClaimsSet claim = decodeToken(token);
         //return true if Jwt token is expired
-        return claimsJws
-                .getBody()
-                .getExpiration()
+        return claim.getExpirationTime()
                 .before(new Date());
     }
     //----------------------------------------------------------//
 
     //return true if client email equals to jwt's subject and token is not expired yet
-    public boolean verifyToken(String token) {
+    public boolean verifyToken(String token) throws ParseException, JOSEException {
         Client client = clientRepository.findClientByToken(token);
-
         //get the right claims from Jws body
-        Jws<Claims> claimsJws = Jwts
-                .parser()
-                .setSigningKey(hexToString(SECRET_KEY))
-                .parseClaimsJws(token);
+        JWTClaimsSet claimsJws = decodeToken(token);
 
         return (
                 (
                         client.getEmail()
-                                .equals(claimsJws.getBody().getSubject())
+                                .equals(claimsJws.getSubject())
                 ) &&
                         !isTokenExpired(token)
         );
     }
 
     //-----------------------------------------------------------------------------------------//
-    public String getEmailFromToken(String token) {
-        return Jwts
-                .parser()
-                .setSigningKey(hexToString(SECRET_KEY))
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+    public String getEmailFromToken(String token) throws ParseException, JOSEException {
+        JWTClaimsSet claimsJws = decodeToken(token);
+        return claimsJws.getSubject();
     }
 }
+

@@ -9,18 +9,28 @@ import com.mainproject.outlinevisionv2.repository.FileRepository;
 import com.mainproject.outlinevisionv2.security.EncodingPassword;
 import com.mainproject.outlinevisionv2.security.jwtSecuritiy.JWTBuilder;
 import com.mainproject.outlinevisionv2.service.FileService;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.shaded.json.JSONArray;
+import com.nimbusds.jwt.EncryptedJWT;
+import com.nimbusds.jwt.JWTClaimsSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 
-@CrossOrigin(origins = "http://192.168.1.2:4200",exposedHeaders ="Authorization")
+@CrossOrigin(origins = "http://192.168.1.5:4200",exposedHeaders ="Authorization")
 @RestController
 @RequestMapping(value = "/clients", method = RequestMethod.POST)
 public class ClientController {
@@ -68,7 +78,7 @@ public class ClientController {
     }
 
     @PostMapping(value = "/register")
-    public ResponseEntity<?> registerClient(@RequestBody Client client){
+    public ResponseEntity<?> registerClient(@RequestBody Client client) throws ParseException, NoSuchAlgorithmException, JOSEException, IOException, InvalidKeySpecException {
         //get client if exists
         Client existsClient = clientRepository.findClientByEmail(client.getEmail());
 
@@ -108,12 +118,16 @@ public class ClientController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Passwords do not match");
         }
         //else return 200 OK status and add custom header "Authorization" to retrieve token for client side
-        String access_token = clientFound.getToken();
+//       String access_token = clientFound.getToken();
 
         clientFound.setActive(true);
         clientFound.setLast_logon(new Date());
         Client savedClient = clientRepository.save(clientFound);
-        return ResponseEntity.ok().header("Authorization",access_token).body(savedClient);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", savedClient.getToken());
+
+        return ResponseEntity.ok().headers(headers).body(savedClient);
     }
 
     @GetMapping(value = "/logout")
@@ -124,9 +138,7 @@ public class ClientController {
 
         clientFound.setLast_logout(new Date());
 
-        Client savedClient = clientRepository.save(clientFound);
-
-        return ResponseEntity.ok().body(savedClient.getActive());
+        return ResponseEntity.ok().body("You have disconnected!");
     }
 
     @GetMapping(value = "/isActive/{id}")
@@ -171,6 +183,16 @@ public class ClientController {
         Client clientFound = clientRepository.findClientById(id);
 
         return ResponseEntity.ok().body(clientFound.getLast_logon());
+
+    }
+
+    @GetMapping(value = "/encrypted-token")
+    public ResponseEntity<?> getClaimsFromToken(@RequestParam("access_token") String access_token) throws ParseException, JOSEException {
+        Client clientFound = clientRepository.findClientByToken(access_token);
+
+        JWTClaimsSet claims = jwtBuilder.decodeToken(access_token);
+
+        return ResponseEntity.ok().body(claims);
 
     }
 }

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-@CrossOrigin(origins = "http://192.168.1.2:4200")
+@CrossOrigin(origins = "http://192.168.1.5:4200")
 @RestController
 public class ChatMessageController {
 

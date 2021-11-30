@@ -2,7 +2,10 @@ package com.mainproject.outlinevisionv2.security.jwtSecuritiy;
 
 import com.mainproject.outlinevisionv2.entity.Client;
 import com.mainproject.outlinevisionv2.repository.ClientRepository;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jwt.EncryptedJWT;
 import io.jsonwebtoken.ExpiredJwtException;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,6 +18,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.text.ParseException;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -33,6 +37,7 @@ public class JwtFilter extends OncePerRequestFilter {
         this.clientRepository = clientRepository;
     }
 
+    @SneakyThrows
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
@@ -50,8 +55,10 @@ public class JwtFilter extends OncePerRequestFilter {
                 System.out.println("Unable to get JWT Token");
             } catch (ExpiredJwtException e) {
                 System.out.println("JWT Token has expired");
+            } catch (ParseException | JOSEException e) {
+                e.printStackTrace();
             }
-        }else logger.warn("Token must start with Bearer");
+        }
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 

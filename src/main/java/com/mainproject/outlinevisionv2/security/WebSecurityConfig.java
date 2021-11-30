@@ -40,6 +40,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/files/**").permitAll()
                 .antMatchers("/app/**").permitAll()
                 .antMatchers("/ws/**").permitAll()
+                .antMatchers("/home/**").permitAll()
                 .anyRequest().authenticated().and().
                 // make sure we use stateless session; session won't be used to
                 // store user's state.

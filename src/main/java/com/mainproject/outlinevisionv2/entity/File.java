@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-@CrossOrigin(origins = "http://192.168.1.2:4200")
 @Entity
 @Table(name = "files")
 public class File{
