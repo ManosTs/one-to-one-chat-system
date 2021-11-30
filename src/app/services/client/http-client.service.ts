@@ -70,4 +70,13 @@ export class HttpClientService {
     return this.httpClient.get(this.url + "all", {observe: 'response'})
   }
 
+  public getClaimsFromToken(encryptedToken:any): Observable<any>{
+    return this.httpClient.get(this.url + "encrypted-token",{
+      params: {
+        access_token: encryptedToken
+      },
+      observe: 'response'
+    })
+  }
+
 }

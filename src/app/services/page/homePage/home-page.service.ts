@@ -10,10 +10,10 @@ export class HomePageService {
   constructor(private httpHomePage: HttpClient) { }
 
 
-  public getAccessToHomePage(token:string) : Observable<any>{
+  public getAccessToHomePage(access_token:any) : Observable<any>{
     return this.httpHomePage.get(this.url,{
       params: {
-        token: token
+        access_token: access_token
       },
       observe: 'response'
     })

@@ -107,7 +107,7 @@ export class LoginFormComponent implements OnInit {
                 {
                   access_token: this.token
                 },
-                  queryParamsHandling: "merge"
+                  queryParamsHandling: ""
             }).then(res => {
             console.log("Logged in successfully" + res)
           })

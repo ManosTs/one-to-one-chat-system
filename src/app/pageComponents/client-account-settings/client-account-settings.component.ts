@@ -7,6 +7,7 @@ import {FileUploadService} from "../../services/client/file-upload.service";
 import {NgbActiveModal, NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {ActivatedRoute, Router} from "@angular/router";
 import {query} from "@angular/animations";
+import {HomePageComponent} from "../home-page/home-page.component";
 
 
 @Component({
@@ -17,10 +18,6 @@ import {query} from "@angular/animations";
 
 export class ClientAccountSettingsComponent implements OnInit {
 
-  public first_name: string = "";
-  public last_name: string = "";
-  public email:string = "";
-
   public loading:boolean = false;
   public message: string = '';
   public fileError: string = '';
@@ -30,10 +27,13 @@ export class ClientAccountSettingsComponent implements OnInit {
 
   isFileChosen:any;
 
-  private decodedToken : any = this.jwtHelper.decodeToken(this.cookieService.get("token"))
+  private decodedToken : any
   public url: any;
 
-  public retrieveIdFromURI: string = "";
+  public fullName: string = "";
+  private clientID: any;
+  private email: string = "";
+  private token: any;
 
   constructor(private httpFile:FileUploadService,
               private jwtHelper: JwtHelperService,private cookieService : CookieService,
@@ -42,17 +42,17 @@ export class ClientAccountSettingsComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
-      this.retrieveIdFromURI = params['id'];
+      this.clientID = params['id'];
+      this.token = params['access_token']
     });
-    this.first_name = `${(this.decodedToken)['first_name']}`
-    this.last_name = `${(this.decodedToken)['last_name']}`
-    this.email = `${(this.decodedToken)['sub']}`
+    this.getClaimsFromToken(this.token);
     this.url = "https://az-pe.com/wp-content/uploads/2018/05/blank-profile-picture-973460_960_720-200x200.png"
-    this.getClientProfilePhoto()
   }
 
-  getClientProfilePhoto(){
-    this.httpFile.getFile((this.decodedToken)['client_id']).subscribe(
+
+
+  getClientProfilePhoto(clientID:any){
+    this.httpFile.getFile(clientID).subscribe(
       data =>{
         this.url = "data:image/png;base64," + data.headers.get("File-Data");
       },
@@ -67,6 +67,21 @@ export class ClientAccountSettingsComponent implements OnInit {
   }
 
   file:any
+
+  getClaimsFromToken(encryptedToken:any){
+    this.httpClientService.getClaimsFromToken(encryptedToken).subscribe(
+      data => {
+        this.decodedToken = data.body;
+        this.email = `${(this.decodedToken)["claims"]['sub']}`
+        this.fullName = `${(this.decodedToken)["claims"]['first_name']}` + " " + `${(this.decodedToken)["claims"]['last_name']}`
+
+        this.getClientProfilePhoto(this.clientID)
+      },
+      error => {
+        console.log(error);
+      }
+    )
+  }
 
   onFileChanged(event: any) {
     this.file = event.target.files[0]
@@ -93,7 +108,7 @@ export class ClientAccountSettingsComponent implements OnInit {
 
   uploadFile(){
     this.loading = !this.loading
-    this.httpFile.uploadFile(this.file, (this.decodedToken)['client_id']).subscribe(
+    this.httpFile.uploadFile(this.file, this.clientID).subscribe(
       (event:any) =>{
         if(typeof (event) === "object"){
           this.loading = false

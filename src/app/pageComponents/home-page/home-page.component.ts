@@ -2,14 +2,11 @@ import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {HomePageService} from "../../services/page/homePage/home-page.service";
 import {CookieService} from "ngx-cookie-service";
 import {JwtHelperService} from "@auth0/angular-jwt";
-import {ActivatedRoute, ActivatedRouteSnapshot, Router} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {FileUploadService} from "../../services/client/file-upload.service";
 import {WebSocketService} from "../../services/message/web-socket.service";
 import {HttpClientService} from "../../services/client/http-client.service";
 import {DatePipe} from "@angular/common";
-import {LoginFormComponent} from "../../authComponets/login-form/login-form.component";
-import {HttpParams} from "@angular/common/http";
-
 @Component({
   selector: 'app-home-page',
   templateUrl: './home-page.component.html',
@@ -31,6 +28,9 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   colors = [{status: true, color: "green"}, {status: false, color: "grey"}]
   public clientsList:any = [];
 
+  private decodedToken: any;
+  private clientID: any;
+
   constructor(private httpHomePageService: HomePageService,
               private cookieService: CookieService,
               private jwtHelper: JwtHelperService,
@@ -42,40 +42,23 @@ export class HomePageComponent implements OnInit, AfterViewInit {
               private datePipe: DatePipe) {
   }
 
-  //decode Token to retrieve info from user
-  private decodedToken: any;
 
   //---------------------------------------------------------------------------------------//
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       this.token = params["access_token"];
-      this.httpHomePageService.getAccessToHomePage(this.token).subscribe(res => {
-        console.log(res)
-      },
-        error => {
-        console.log(error)
-        }
-      );
       if(this.token === null){
         this.disconnect()
       }
     })
-    this.decodedToken = this.jwtHelper.decodeToken(this.token);
-    this.router.navigate(['/home'])
+
+    this.getClaimsFromToken(this.token);
+
     this.connect()
-
-    this.lastLogon()
-
-    this.isUserActive()
-
-    this.fullName = (this.decodedToken)["first_name"] + " " + (this.decodedToken)["last_name"]
 
     this.imageUrl = "https://az-pe.com/wp-content/uploads/2018/05/blank-profile-picture-973460_960_720-200x200.png"
 
-    this.getClientProfilePhoto()
-
-    console.log(this.getAllClientsByFirstName())
   }
 
   changeColorOnStatus(status: any) {
@@ -86,10 +69,29 @@ export class HomePageComponent implements OnInit, AfterViewInit {
 
   }
 
-  isUserActive() {
-    this.httpClient.isUserActive((this.decodedToken)["client_id"]).subscribe(
+  getClaimsFromToken(encryptedToken:any){
+    this.httpClient.getClaimsFromToken(encryptedToken).subscribe(
+      data => {
+        this.decodedToken = data.body;
+        this.clientID = `${(this.decodedToken)["claims"]["client_id"]}`
+        this.fullName = `${(this.decodedToken)["claims"]['first_name']}` + " " + `${(this.decodedToken)["claims"]['last_name']}`
+
+        this.isUserActive(this.clientID);
+        this.lastLogon(this.clientID);
+        this.getClientProfilePhoto(this.clientID);
+      },
+      error => {
+        console.log(error);
+      }
+    )
+
+  }
+
+  isUserActive(clientID:any) {
+    this.httpClient.isUserActive(clientID).subscribe(
       data => {
         this.isActive = data.body;
+        console.warn(this.isActive)
       },
       error => {
         console.log(error)
@@ -97,8 +99,8 @@ export class HomePageComponent implements OnInit, AfterViewInit {
     );
   }
 
-  changeStatus(status: boolean) {
-    this.httpClient.changeStatus((this.decodedToken)["client_id"], status).subscribe(
+  changeStatus(clientID:any,status: boolean) {
+    this.httpClient.changeStatus(clientID,status).subscribe(
       data => {
         this.isActive = data.body
       },
@@ -110,14 +112,14 @@ export class HomePageComponent implements OnInit, AfterViewInit {
 
   onActiveStatusChange() {
     this.isActive = !this.isActive
-    this.changeStatus(this.isActive)
+    this.changeStatus(this.clientID,this.isActive)
   }
 
-  lastLogon() {
-    this.httpClient.lastLogon((this.decodedToken)["client_id"]).subscribe(
+  lastLogon(clientID:any) {
+    this.httpClient.lastLogon(clientID).subscribe(
       data => {
         let date = data.body;
-        this.lastLogOn = this.datePipe.transform(date, 'yyyy-MM-dd hh:mm')
+        this.lastLogOn = this.datePipe.transform(date, 'yyyy-MM-dd hh:mm a')
       },
       error => {
         console.log(error)
@@ -126,12 +128,10 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   }
   //sign out user
   signOut() {
-    this.httpClient.logoutUser((this.decodedToken)["client_id"]).subscribe(
+    this.httpClient.logoutUser(this.clientID).subscribe(
       res => {
-        this.cookieService.delete("token");
-        window.localStorage.removeItem("token");
         this.disconnect();
-        this.router.navigate(["/logout"], {queryParams: {id: (this.decodedToken)["client_id"]}, queryParamsHandling: "merge"}).then(res =>{
+        this.router.navigate(["/logout"], {queryParams: {id: this.clientID}, queryParamsHandling: "merge"}).then(res =>{
         })
       },
       error => {
@@ -145,14 +145,18 @@ export class HomePageComponent implements OnInit, AfterViewInit {
 
   //navigate user to settings page
   getClientToSettings() {
-    this.router.navigate(['/settings'],{queryParams: {id: (this.decodedToken)['client_id']},queryParamsHandling: ""});
+    this.router.navigate(['/settings'],{queryParams: {
+        id: this.clientID,
+        access_token: this.token
+
+      },queryParamsHandling: ""});
   }
 
   //----------------------------------------------------------------------------------------//
 
   //method to retrieve the data of user pic in order to show to
-  getClientProfilePhoto() {
-    this.http.getFile((this.decodedToken)['client_id']).subscribe(
+  getClientProfilePhoto(clientID:any) {
+    this.http.getFile(clientID).subscribe(
       data => {
         this.imageUrl = "data:image/png;base64," + data.headers.get("File-Data");
       },
