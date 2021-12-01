@@ -68,7 +68,8 @@ const appRoutes: Routes = [
   },
   {
     path: 'logout',
-    component: LoginFormComponent
+    redirectTo: "/login",
+    pathMatch:"full"
   },
 
   {

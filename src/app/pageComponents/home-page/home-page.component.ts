@@ -20,6 +20,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   public time: any;
   public isActive: boolean = false;
   public lastLogOn: any;
+  public lastSeen:any;
 
   public token:any;
 
@@ -46,12 +47,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   //---------------------------------------------------------------------------------------//
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
-      this.token = params["access_token"];
-      if(this.token === null){
-        this.disconnect()
-      }
-    })
+    this.token = this.cookieService.get("sessionID")
 
     this.getClaimsFromToken(this.token);
 
@@ -59,6 +55,18 @@ export class HomePageComponent implements OnInit, AfterViewInit {
 
     this.imageUrl = "https://az-pe.com/wp-content/uploads/2018/05/blank-profile-picture-973460_960_720-200x200.png"
 
+  }
+
+  lastSeenGetter(clientID:any){
+    this.httpClient.lastSeen(clientID).subscribe(
+      res =>{
+        if(res.body == 0){
+          this.lastSeen = "now";
+          return;
+        }
+        this.lastSeen = res.body + " min(s) ago";
+      }
+    )
   }
 
   changeColorOnStatus(status: any) {
@@ -74,11 +82,13 @@ export class HomePageComponent implements OnInit, AfterViewInit {
       data => {
         this.decodedToken = data.body;
         this.clientID = `${(this.decodedToken)["claims"]["client_id"]}`
-        this.fullName = `${(this.decodedToken)["claims"]['first_name']}` + " " + `${(this.decodedToken)["claims"]['last_name']}`
+        this.fullName = `${(this.decodedToken)["claims"]['first_name']}` + " "
+                                                        + `${(this.decodedToken)["claims"]['last_name']}`
 
         this.isUserActive(this.clientID);
         this.lastLogon(this.clientID);
         this.getClientProfilePhoto(this.clientID);
+        this.lastSeenGetter(this.clientID);
       },
       error => {
         console.log(error);
@@ -91,7 +101,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
     this.httpClient.isUserActive(clientID).subscribe(
       data => {
         this.isActive = data.body;
-        console.warn(this.isActive)
+
       },
       error => {
         console.log(error)
@@ -113,6 +123,9 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   onActiveStatusChange() {
     this.isActive = !this.isActive
     this.changeStatus(this.clientID,this.isActive)
+    if(!this.isActive){
+
+    }
   }
 
   lastLogon(clientID:any) {
@@ -131,6 +144,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
     this.httpClient.logoutUser(this.clientID).subscribe(
       res => {
         this.disconnect();
+        this.cookieService.delete("sessionID")
         this.router.navigate(["/logout"], {queryParams: {id: this.clientID}, queryParamsHandling: "merge"}).then(res =>{
         })
       },
@@ -146,8 +160,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   //navigate user to settings page
   getClientToSettings() {
     this.router.navigate(['/settings'],{queryParams: {
-        id: this.clientID,
-        access_token: this.token
+        id: this.clientID
 
       },queryParamsHandling: ""});
   }

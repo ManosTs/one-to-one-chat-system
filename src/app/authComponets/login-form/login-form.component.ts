@@ -100,27 +100,29 @@ export class LoginFormComponent implements OnInit {
           if (this.token === null) {
             return;
           }
-          this.rememberMe()
-          this.router.navigate(["/home"],
+          this.cookie.set("sessionID",this.token);
+
+          // this.rememberMe()
+          this.router.navigate([""],
             {
               queryParams:
                 {
                   access_token: this.token
                 },
-                  queryParamsHandling: ""
+              queryParamsHandling: "merge"
             }).then(res => {
-            console.log("Logged in successfully" + res)
+                this.router.navigate(["/home"])
+                console.log("Logged in successfully" + res)
           })
         },
         error => {
           if (error.status === 404) {
             this.emailError = "EMAIL NOT FOUND"
-
           }
           if (error.status === 403) {
             this.emailError = "ACCESS DENIED, CHECK PASSWORD"
           }
-          console.log(error)
+          console.error(error)
         })
     }
   }
@@ -135,7 +137,6 @@ export class LoginFormComponent implements OnInit {
       return;
     }
     window.localStorage.removeItem("token");
-
   }
 
   ngOnInit(): void {

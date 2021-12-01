@@ -54,7 +54,12 @@ export class HttpClientService {
   }
 
   public lastSeen(id: string): Observable<any> {
-    return this.httpClient.get(this.url + id + "/lastSeen", {observe: 'response'})
+    return this.httpClient.get(this.url + "lastSeen",{
+      params: {
+        id: id
+      },
+      observe: 'response'
+    })
   }
 
 

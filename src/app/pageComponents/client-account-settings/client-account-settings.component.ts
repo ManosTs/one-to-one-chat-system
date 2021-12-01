@@ -43,8 +43,8 @@ export class ClientAccountSettingsComponent implements OnInit {
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       this.clientID = params['id'];
-      this.token = params['access_token']
     });
+    this.token = this.cookieService.get("sessionID")
     this.getClaimsFromToken(this.token);
     this.url = "https://az-pe.com/wp-content/uploads/2018/05/blank-profile-picture-973460_960_720-200x200.png"
   }
