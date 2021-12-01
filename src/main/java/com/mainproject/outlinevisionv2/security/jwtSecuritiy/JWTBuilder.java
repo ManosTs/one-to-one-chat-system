@@ -12,6 +12,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 import java.text.ParseException;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -84,9 +85,13 @@ public class JWTBuilder {
 
         //-------------------------------------------------------------------------------//
 
-        //save client's public key to file
-        try (FileOutputStream fos = new FileOutputStream(client.getId()+ "-public.key")) {
-            fos.write(publicKey.getEncoded());
+        // Store Public Key.
+        try {
+            X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(
+                    publicKey.getEncoded());
+            FileOutputStream fos = new FileOutputStream(client.getId()+ "-public.key");
+            fos.write(x509EncodedKeySpec.getEncoded());
+            fos.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -96,7 +101,7 @@ public class JWTBuilder {
         return jwtString; //returns the encrypted token
     }
 
-    public JWTClaimsSet decodeToken (String jwtString) throws ParseException, JOSEException {
+    public JWTClaimsSet decodeToken(String jwtString) throws ParseException, JOSEException {
         EncryptedJWT jwt = EncryptedJWT.parse(jwtString);
         // Create a rsaDecrypter with the specified private RSA key
         RSADecrypter rsaDecrypter = new RSADecrypter(privateKey);

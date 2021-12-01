@@ -21,16 +21,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Base64;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
-@CrossOrigin(origins = "http://192.168.1.5:4200",exposedHeaders ="Authorization")
+@CrossOrigin(origins = "http://192.168.1.5:4200", exposedHeaders = "Authorization")
 @RestController
 @RequestMapping(value = "/clients", method = RequestMethod.POST)
 public class ClientController {
@@ -105,7 +107,7 @@ public class ClientController {
     }
 
     @PostMapping(value = "/login")
-    public ResponseEntity<?> loginClient(@RequestBody Client client){
+    public ResponseEntity<?> loginClient(@RequestBody Client client, HttpServletResponse response) throws ParseException, JOSEException {
         Client clientFound = clientRepository.findClientByEmail(client.getEmail());
 
         //if client is not found return not found status
@@ -154,9 +156,13 @@ public class ClientController {
 
         if(!status){
             clientFound.setActive(false);
+            clientFound.setLast_logout(new Date());
             Client savedClient = clientRepository.save(clientFound);
             return ResponseEntity.ok().body(savedClient.getActive());
         }
+
+        clientFound.setLast_logout(null);
+
         clientFound.setActive(true);
 
         Client savedClient = clientRepository.save(clientFound);
@@ -164,18 +170,24 @@ public class ClientController {
         return ResponseEntity.ok().body(savedClient.getActive());
     }
 
-    @GetMapping(value = "/{id}/lastSeen")
-    public ResponseEntity<?> lastSeen(@PathVariable String id) {
+    @GetMapping(value = "/lastSeen")
+    public ResponseEntity<?> lastSeen(@RequestParam("id") String id) {
         Client clientFound = clientRepository.findClientById(id);
 
-        Date date1 = clientFound.getLast_logon();
-        Date date2 = clientFound.getLast_logout();
+        Date date1 = clientFound.getLast_logout();
+        Date date2 = new Date();
 
         long diff = date2.getTime() - date1.getTime();
 
+        if(diff == date2.getTime()){
+            return ResponseEntity.ok().body(0);
+        }
+
         long diffInMinutes = diff / (60 * 1000) % 60;
 
-        return ResponseEntity.ok().body(diffInMinutes + " min(s)");
+
+
+        return ResponseEntity.ok().body(diffInMinutes);
     }
 
     @GetMapping(value = "/{id}/lastLogon")
@@ -188,7 +200,6 @@ public class ClientController {
 
     @GetMapping(value = "/encrypted-token")
     public ResponseEntity<?> getClaimsFromToken(@RequestParam("access_token") String access_token) throws ParseException, JOSEException {
-        Client clientFound = clientRepository.findClientByToken(access_token);
 
         JWTClaimsSet claims = jwtBuilder.decodeToken(access_token);
 
