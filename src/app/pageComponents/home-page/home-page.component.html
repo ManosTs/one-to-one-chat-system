@@ -22,17 +22,17 @@
   </div>
   <div class="navbar-nav ml-lg-2">
     <p style="color: white; border: 1px solid white">Last logon at: {{lastLogOn}}, Active: {{isActive}}</p>
-    <p  style="margin-left: 5px;color: white; border: 1px solid white">Active:{{lastSeen}}</p>
+    <p style="margin-left: 5px;color: white; border: 1px solid white">Active:{{lastSeen}}</p>
   </div>
   <form class="navbar-nav ml-auto">
-    <input  id="search"
+    <input id="search"
            placeholder="Search people..."
            name="search"
-           type = "text"
+           type="text"
            [(ngModel)]="searchPeople"
-            autofocus
+           autofocus
     />
-      <button (click)="getAllClientsByFirstName()" id="search-button" type="submit">Search</button>
+    <button (click)="getAllClientsByFirstName()" id="search-button" type="submit">Search</button>
   </form>
 </div>
 
@@ -49,11 +49,18 @@
     <div class="chat-col">
       <div class="row">
         <div class="message-output-col">
-          <span class="message-output" readonly *ngFor="let msg of webSocket.message">
+          <span class="message-output" *ngFor="let msg of webSocket.message ">
             {{msg}}
-            <span class="name-output-config">
-               {{time}}-{{webSocket.sender}}:
+
+            <span *ngFor="let sender of webSocket.sender" class="name-output-config">
+              <span *ngFor="let time of webSocket.time">
+               {{time}}-
             </span>
+              {{sender}}:
+            </span>
+
+
+
           </span>
         </div>
       </div>

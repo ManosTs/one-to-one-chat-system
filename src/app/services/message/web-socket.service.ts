@@ -44,7 +44,7 @@ export class WebSocketService {
           let messageOutPut = JSON.parse(message.body)
           this.message.push(messageOutPut.content);
           this.time.push(messageOutPut.time);
-          this.sender = messageOutPut.sender;
+          this.sender.push(messageOutPut.sender);
         }
       })
     })

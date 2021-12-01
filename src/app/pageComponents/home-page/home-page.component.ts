@@ -214,7 +214,6 @@ export class HomePageComponent implements OnInit, AfterViewInit {
     if (this.message) {
       this.webSocket.sendMessage(this.fullName, this.message);
       this.message = "";
-      this.time = this.webSocket.time;
     }
   }
 
