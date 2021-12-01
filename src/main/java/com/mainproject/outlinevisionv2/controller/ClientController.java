@@ -177,11 +177,11 @@ public class ClientController {
         Date date1 = clientFound.getLast_logout();
         Date date2 = new Date();
 
-        long diff = date2.getTime() - date1.getTime();
-
-        if(diff == date2.getTime()){
+        if(date1 == null){
             return ResponseEntity.ok().body(0);
         }
+
+        long diff = date2.getTime() - date1.getTime();
 
         long diffInMinutes = diff / (60 * 1000) % 60;
 
