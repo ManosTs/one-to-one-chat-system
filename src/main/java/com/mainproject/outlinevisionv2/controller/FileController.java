@@ -6,14 +6,17 @@ import com.mainproject.outlinevisionv2.repository.ClientRepository;
 import com.mainproject.outlinevisionv2.repository.FileRepository;
 import com.mainproject.outlinevisionv2.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.persistence.Convert;
 import java.util.Base64;
 
 @RestController
-@CrossOrigin(origins = "http://192.168.1.5:4200", exposedHeaders = "File-Data, Authorization")
+@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping(value = "/files", method = RequestMethod.POST)
 public class FileController {
     private FileService fileService;
@@ -61,11 +64,18 @@ public class FileController {
     }
 
     @GetMapping("/client-id={id}")
-    public ResponseEntity getFile(@PathVariable String id){
+    public ResponseEntity<?> getFile(@PathVariable String id){
+
         Client clientFound = clientRepository.findClientById(id);
         File file = fileService.getFile(clientFound.getFileID());
-        String s = Base64.getEncoder().encodeToString(file.getData());
-        return ResponseEntity.ok().header("File-Data", s).body(file);
+
+
+        String byteToString = Base64.getEncoder().encodeToString(file.getData());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_LENGTH, String.valueOf(file.getData().length));
+
+        return ResponseEntity.ok().headers(headers).body("data:image/png;base64,"+byteToString);
     }
 
 }

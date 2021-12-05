@@ -1,13 +1,11 @@
 package com.mainproject.outlinevisionv2.controller;
 
-
-import com.mainproject.outlinevisionv2.entity.Client;
 import com.mainproject.outlinevisionv2.repository.ClientRepository;
 import com.mainproject.outlinevisionv2.security.jwtSecuritiy.JWTBuilder;
 import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jwt.EncryptedJWT;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.WebUtils;
 
@@ -17,8 +15,8 @@ import java.text.ParseException;
 
 @CrossOrigin(origins = "http://localhost:4200",allowCredentials = "true")
 @RestController
-@RequestMapping(value = "/home", method = RequestMethod.POST)
-public class HomePageController {
+@RequestMapping(value = "/settings", method = RequestMethod.POST)
+public class ClientSettingsPageController {
 
     private ClientRepository clientRepository;
 
@@ -36,16 +34,16 @@ public class HomePageController {
 
     @GetMapping
     public ResponseEntity<?> verifyAccess(HttpServletRequest request) throws ParseException, JOSEException {
-        Cookie cookie = WebUtils.getCookie(request, "enc_token");
+        Cookie cookie1 = WebUtils.getCookie(request, "enc_token");
 
-        if(cookie == null){
+        if(cookie1 == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(false);
         }
 
-        if(!jwtBuilder.verifyToken(cookie.getValue().substring(7))){
+        if(!jwtBuilder.verifyToken(cookie1.getValue().substring(7))){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(false);
         }
 
-        return ResponseEntity.ok().body(cookie.getValue().substring(7));
+        return ResponseEntity.ok().body(cookie1.getValue().substring(7));
     }
 }

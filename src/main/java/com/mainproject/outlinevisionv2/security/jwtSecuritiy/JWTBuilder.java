@@ -2,16 +2,23 @@ package com.mainproject.outlinevisionv2.security.jwtSecuritiy;
 
 import com.mainproject.outlinevisionv2.entity.Client;
 import com.mainproject.outlinevisionv2.repository.ClientRepository;
+import org.bouncycastle.util.io.pem.PemObject;
+import org.bouncycastle.util.io.pem.PemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.text.ParseException;
 import java.time.ZonedDateTime;
@@ -40,6 +47,11 @@ public class JWTBuilder {
 
     public JWTBuilder(@Value("${jwt.secret}") String key) throws NoSuchAlgorithmException {
         this.SECRET_KEY = key;
+    }
+
+    public Long getExpirationDate(String jwtString) throws ParseException, JOSEException {
+        JWTClaimsSet claims = decodeToken(jwtString);
+        return claims.getExpirationTime().getTime();
     }
 
     //public and private key generators
@@ -85,11 +97,12 @@ public class JWTBuilder {
 
         //-------------------------------------------------------------------------------//
 
-        // Store Public Key.
+        // Store Public Key in file.
+        FileOutputStream fos = new FileOutputStream(client.getId()+ "-public.key");
         try {
             X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(
                     publicKey.getEncoded());
-            FileOutputStream fos = new FileOutputStream(client.getId()+ "-public.key");
+
             fos.write(x509EncodedKeySpec.getEncoded());
             fos.close();
         } catch (IOException e) {

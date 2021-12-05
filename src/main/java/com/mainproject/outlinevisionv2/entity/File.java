@@ -23,8 +23,8 @@ public class File{
     @Lob
     private byte[] data;
 
-    @OneToMany(mappedBy = "file")
-    private Set<Client> clients = new HashSet<>();
+    @OneToOne(mappedBy = "file")
+    private Client client;
 
     public File(){
     }
@@ -36,12 +36,12 @@ public class File{
         this.data = data;
     }
 
-    public void setClients(Set<Client> clients) {
-        this.clients = clients;
+    public void setClient(Client client) {
+        this.client = client;
     }
 
-    public Set<Client> getClients() {
-        return clients;
+    public Client getClient() {
+        return client;
     }
 
     public String getId() {

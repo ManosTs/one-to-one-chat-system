@@ -44,6 +44,8 @@ public class Client {
     @Column(name= "last_logon", nullable = true)
     private Date last_logon ;
 
+    private String confirmPassword;
+
 
     @ManyToMany(cascade = CascadeType.ALL,fetch=FetchType.EAGER)
     @JoinTable(
@@ -53,14 +55,13 @@ public class Client {
     )
     private Set<Authority> authorities = new HashSet<>();
 
-    @JsonIgnore
-    @ManyToOne(cascade = CascadeType.ALL,fetch=FetchType.EAGER)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinTable(
             name = "clients_profile_pictures",
             joinColumns = @JoinColumn(name = "client_id"),
             inverseJoinColumns = @JoinColumn(name = "file_id")
     )
-    private File file = new File();
+    private File file;
 
     //---------------------------------------------------------------------//
 
@@ -113,6 +114,10 @@ public class Client {
         this.fileID = fileID;
     }
 
+    public void setConfirmPassword(String confirmPassword) {
+        this.confirmPassword = confirmPassword;
+    }
+
     //-----------------------------------------//
 
     //getters
@@ -162,5 +167,9 @@ public class Client {
 
     public String getFileID() {
         return fileID;
+    }
+
+    public String getConfirmPassword() {
+        return confirmPassword;
     }
 }

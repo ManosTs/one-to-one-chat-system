@@ -12,13 +12,16 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.WebUtils;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Arrays;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -42,13 +45,13 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        String requestTokenHeader = request.getHeader("Authorization");
+        Cookie cookie = WebUtils.getCookie(request,"enc_token");
 
         String email = null;
         String token = null;
 
-        if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
-            token = requestTokenHeader.substring(7);
+        if (cookie != null && cookie.getValue().startsWith("Bearer+")) {
+            token = cookie.getValue().substring(7);
             try {
                 email = jwtBuilder.getEmailFromToken(token);
             } catch (IllegalArgumentException e) {
