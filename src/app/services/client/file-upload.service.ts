@@ -25,6 +25,6 @@ export class FileUploadService {
   }
 
   public getFile(id:string) : Observable<any>{
-    return this.httpClient.get(this.url + "client-id="+ id, {observe:'response'})
+    return this.httpClient.get(this.url + "client-id="+ id, {observe:'response', responseType: "text"})
   }
 }

@@ -21,10 +21,11 @@ export class RegisterFormComponent implements OnInit {
   public confirmPassword: string = ''
 
   public confirmPasswordError: string = '';
+
   @Input()
   emailPattern: string | RegExp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 
-  user: RegisterUser = new RegisterUser("","", "", "");
+  user: RegisterUser = new RegisterUser("","", "", "", "");
 
   public loading: boolean = false;
 
@@ -32,10 +33,12 @@ export class RegisterFormComponent implements OnInit {
   }
 
   validationForm(): boolean {
-    if((this.user.email &&
+    if(
+      (this.user.email &&
       this.user.firstName &&
       this.user.lastName &&
-      this.user.password) == "") {
+      this.user.password &&
+      this.user.confirmPassword) == "") {
       this.emailError = "EMAIL FIELD IS REQUIRED";
       this.passwordError = "PASSWORD FIELD IS REQUIRED";
       this.firstNameError = "FIRST NAME FIELD IS REQUIRED"
@@ -78,7 +81,7 @@ export class RegisterFormComponent implements OnInit {
       this.passwordError = "";
     }
 
-    if (this.confirmPassword === "") {
+    if (this.user.confirmPassword === "") {
       this.confirmPasswordError = "CONFIRM PASSWORD FIELD IS REQUIRED";
       return false;
     } else {
@@ -92,7 +95,7 @@ export class RegisterFormComponent implements OnInit {
       this.emailError = "";
     }
 
-    if (this.confirmPassword != this.user.password) {
+    if (this.user.confirmPassword != this.user.password) {
       this.confirmPasswordError = "PASSWORDS DO NOT MATCH"
       return false;
     } else {

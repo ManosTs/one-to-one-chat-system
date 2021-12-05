@@ -8,6 +8,7 @@ import {NgbActiveModal, NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {ActivatedRoute, Router} from "@angular/router";
 import {query} from "@angular/animations";
 import {HomePageComponent} from "../home-page/home-page.component";
+import {ClientSettingsPageService} from "../../services/page/clientSettingsPage/client-settings-page.service";
 
 
 @Component({
@@ -38,15 +39,20 @@ export class ClientAccountSettingsComponent implements OnInit {
   constructor(private httpFile:FileUploadService,
               private jwtHelper: JwtHelperService,private cookieService : CookieService,
               private httpClientService: HttpClientService,
-              private route: ActivatedRoute) { }
+              private route: ActivatedRoute,
+              private httpClientSettings: ClientSettingsPageService) { }
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       this.clientID = params['id'];
     });
-    this.token = this.cookieService.get("sessionID")
-    this.getClaimsFromToken(this.token);
-    this.url = "https://az-pe.com/wp-content/uploads/2018/05/blank-profile-picture-973460_960_720-200x200.png"
+    this.httpClientSettings.verifyAccess().subscribe(
+      res =>{
+        this.token = res.body;
+        this.getClaimsFromToken(this.token);
+      },error => {
+        console.log(error)
+      })
   }
 
 
@@ -54,7 +60,7 @@ export class ClientAccountSettingsComponent implements OnInit {
   getClientProfilePhoto(clientID:any){
     this.httpFile.getFile(clientID).subscribe(
       data =>{
-        this.url = "data:image/png;base64," + data.headers.get("File-Data");
+        this.url = data.body;
       },
       error => {
         console.log(error)

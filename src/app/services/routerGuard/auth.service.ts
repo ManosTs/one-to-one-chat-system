@@ -1,21 +1,22 @@
-import { Injectable } from '@angular/core';
-import {JwtHelperService} from "@auth0/angular-jwt";
+import {Injectable} from '@angular/core';
 import {CookieService} from "ngx-cookie-service";
-import {ActivatedRoute} from "@angular/router";
+import {HttpClientService} from "../client/http-client.service";
+import {HomePageService} from "../page/homePage/home-page.service";
+import {first} from "rxjs/operators";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private enc_token: any;
+  isAuth: any;
 
-  constructor(private jwtHelper: JwtHelperService) {}
+  constructor(private httpHome: HomePageService,
+              private cookieHandler: CookieService,
+              private httpClient: HttpClientService) {
+  }
 
-  private access_token: any ;
-
-  public isAuthenticated(param_token:any): boolean {
-    this.access_token = param_token;
-
-    // return !this.jwtHelper.isTokenExpired(this.access_token);
-    return true;
+  public isAuthenticated(): any {
+    return true
   }
 }

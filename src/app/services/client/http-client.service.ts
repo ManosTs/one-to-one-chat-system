@@ -16,7 +16,8 @@ export class RegisterUser {
     public email: string,
     public firstName: string,
     public lastName: string,
-    public password: string
+    public password: string,
+    public confirmPassword: string
   ) {
   }
 }
@@ -37,7 +38,7 @@ export class HttpClientService {
   }
 
   public loginUser(user: LoginUser): Observable<any> {
-    return this.httpClient.post(this.url + 'login', user, {observe: 'response'})
+    return this.httpClient.post(this.url + 'login', user, {observe: 'response',responseType:'text', withCredentials:true})
   }
 
   public logoutUser(id: string): Observable<any> {

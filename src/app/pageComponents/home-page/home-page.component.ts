@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnInit} from '@angular/core';
+import {AfterViewInit, Component, OnInit, Sanitizer} from '@angular/core';
 import {HomePageService} from "../../services/page/homePage/home-page.service";
 import {CookieService} from "ngx-cookie-service";
 import {JwtHelperService} from "@auth0/angular-jwt";
@@ -7,6 +7,8 @@ import {FileUploadService} from "../../services/client/file-upload.service";
 import {WebSocketService} from "../../services/message/web-socket.service";
 import {HttpClientService} from "../../services/client/http-client.service";
 import {DatePipe} from "@angular/common";
+import {DomSanitizer} from "@angular/platform-browser";
+import {resolve} from "@angular/compiler-cli/src/ngtsc/file_system";
 @Component({
   selector: 'app-home-page',
   templateUrl: './home-page.component.html',
@@ -40,23 +42,24 @@ export class HomePageComponent implements OnInit, AfterViewInit {
               private http: FileUploadService,
               public webSocket: WebSocketService,
               private httpClient: HttpClientService,
-              private datePipe: DatePipe) {
+              private datePipe: DatePipe,
+              private sanitizer: DomSanitizer) {
   }
 
 
   //---------------------------------------------------------------------------------------//
 
   ngOnInit(): void {
-    this.token = this.cookieService.get("sessionID")
-
-    this.getClaimsFromToken(this.token);
+    this.httpHomePageService.verifyAccess().subscribe(res =>{
+      this.token = res.body;
+      this.getClaimsFromToken(this.token);
+    },error => {
+      console.log(error)
+    })
 
     this.connect()
 
-    this.imageUrl = "https://az-pe.com/wp-content/uploads/2018/05/blank-profile-picture-973460_960_720-200x200.png"
-
   }
-
   lastSeenGetter(clientID:any){
     this.httpClient.lastSeen(clientID).subscribe(
       res =>{
@@ -144,8 +147,8 @@ export class HomePageComponent implements OnInit, AfterViewInit {
     this.httpClient.logoutUser(this.clientID).subscribe(
       res => {
         this.disconnect();
-        this.cookieService.delete("sessionID")
-        this.router.navigate(["/logout"], {queryParams: {id: this.clientID}, queryParamsHandling: "merge"}).then(res =>{
+        this.cookieService.delete("enc_token")
+        this.router.navigate(["/login"], {queryParams: {id: this.clientID}, queryParamsHandling: "merge"}).then(res =>{
         })
       },
       error => {
@@ -171,7 +174,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   getClientProfilePhoto(clientID:any) {
     this.http.getFile(clientID).subscribe(
       data => {
-        this.imageUrl = "data:image/png;base64," + data.headers.get("File-Data");
+        this.imageUrl = data.body;
       },
       error => {
         console.log(error)

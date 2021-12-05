@@ -96,24 +96,8 @@ export class LoginFormComponent implements OnInit {
       this.httpClientService.loginUser(this.user).subscribe(
         (res) => {
           this.user = res;
-          this.token = res.headers.get("Authorization")
-          if (this.token === null) {
-            return;
-          }
-          this.cookie.set("sessionID",this.token);
 
-          // this.rememberMe()
-          this.router.navigate([""],
-            {
-              queryParams:
-                {
-                  access_token: this.token
-                },
-              queryParamsHandling: "merge"
-            }).then(res => {
-                this.router.navigate(["/home"])
-                console.log("Logged in successfully" + res)
-          })
+          this.router.navigate(["/home"]);
         },
         error => {
           if (error.status === 404) {
@@ -127,7 +111,10 @@ export class LoginFormComponent implements OnInit {
     }
   }
 
-  rememberValue(event: any) {
+  rememberValue(event
+                  :
+                  any
+  ) {
     this.remember = event.target.checked
   }
 
@@ -139,7 +126,9 @@ export class LoginFormComponent implements OnInit {
     window.localStorage.removeItem("token");
   }
 
-  ngOnInit(): void {
+  ngOnInit()
+    :
+    void {
     this.router.navigate(['login'])
     this.autoCompleteCred()
     this.url = "https://az-pe.com/wp-content/uploads/2018/05/blank-profile-picture-973460_960_720-200x200.png"
