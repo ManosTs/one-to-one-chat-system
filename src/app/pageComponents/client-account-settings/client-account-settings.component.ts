@@ -60,7 +60,7 @@ export class ClientAccountSettingsComponent implements OnInit {
   getClientProfilePhoto(clientID:any){
     this.httpFile.getFile(clientID).subscribe(
       data =>{
-        this.url = data.body;
+        this.url = "data:image/png;base64,"+data.body;
       },
       error => {
         console.log(error)

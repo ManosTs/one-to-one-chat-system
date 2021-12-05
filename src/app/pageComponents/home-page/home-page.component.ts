@@ -42,8 +42,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
               private http: FileUploadService,
               public webSocket: WebSocketService,
               private httpClient: HttpClientService,
-              private datePipe: DatePipe,
-              private sanitizer: DomSanitizer) {
+              private datePipe: DatePipe) {
   }
 
 
@@ -174,7 +173,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   getClientProfilePhoto(clientID:any) {
     this.http.getFile(clientID).subscribe(
       data => {
-        this.imageUrl = data.body;
+        this.imageUrl = "data:image/png;base64," + data.body;
       },
       error => {
         console.log(error)
