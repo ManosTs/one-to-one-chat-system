@@ -72,10 +72,7 @@ public class FileController {
 
         String byteToString = Base64.getEncoder().encodeToString(file.getData());
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_LENGTH, String.valueOf(file.getData().length));
-
-        return ResponseEntity.ok().headers(headers).body("data:image/png;base64,"+byteToString);
+        return ResponseEntity.ok().body(byteToString);
     }
 
 }
