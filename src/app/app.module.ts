@@ -1,12 +1,17 @@
-import {InjectionToken, NgModule} from '@angular/core';
+import {NgModule} from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginFormComponent } from './authComponets/login-form/login-form.component';
 import { RegisterFormComponent } from './authComponets/register-form/register-form.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import {ActivatedRouteSnapshot, RouterModule, Routes} from "@angular/router";
+import {RouterModule, Routes} from "@angular/router";
+import {FormsModule} from "@angular/forms";
+import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
+import { HomePageComponent } from './pageComponents/home-page/home-page.component';
+import { ClientAccountSettingsComponent } from './pageComponents/client-account-settings/client-account-settings.component';
+import {DatePipe} from "@angular/common";
+
 import {
   circleFill,
   chat,
@@ -25,14 +30,6 @@ import {
   NgxBootstrapIconsModule,
   xCircle
 } from 'ngx-bootstrap-icons';
-import {FormsModule} from "@angular/forms";
-import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
-import { HomePageComponent } from './pageComponents/home-page/home-page.component';
-import {AuthGuardService} from "./services/routerGuard/auth-guard.service";
-import {AuthService} from "./services/routerGuard/auth.service";
-import {JWT_OPTIONS, JwtHelperService} from "@auth0/angular-jwt";
-import { ClientAccountSettingsComponent } from './pageComponents/client-account-settings/client-account-settings.component';
-import {DatePipe} from "@angular/common";
 
 const icons = {
   eye,
@@ -74,13 +71,11 @@ const appRoutes: Routes = [
 
   {
     path: 'home',
-    component: HomePageComponent,
-    canActivate: [AuthGuardService]
+    component: HomePageComponent
   },
   {
     path: 'settings',
-    component: ClientAccountSettingsComponent,
-    canActivate: [AuthGuardService]
+    component: ClientAccountSettingsComponent
   }
 
 ];
@@ -105,9 +100,7 @@ const appRoutes: Routes = [
     FormsModule,
     HttpClientModule,
   ],
-  providers: [AuthGuardService,AuthService,
-    { provide: JWT_OPTIONS, useValue: JWT_OPTIONS },
-    JwtHelperService,
+  providers: [
     DatePipe
   ],
   bootstrap: [AppComponent]

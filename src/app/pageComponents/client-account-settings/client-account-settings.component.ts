@@ -1,13 +1,8 @@
 import {Component, Directive, Input, OnInit} from '@angular/core';
-import {JwtHelperService} from "@auth0/angular-jwt";
 import {CookieService} from "ngx-cookie-service";
-import {HttpClient} from "@angular/common/http";
 import {HttpClientService} from "../../services/client/http-client.service";
 import {FileUploadService} from "../../services/client/file-upload.service";
-import {NgbActiveModal, NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {ActivatedRoute, Router} from "@angular/router";
-import {query} from "@angular/animations";
-import {HomePageComponent} from "../home-page/home-page.component";
 import {ClientSettingsPageService} from "../../services/page/clientSettingsPage/client-settings-page.service";
 
 
@@ -37,9 +32,10 @@ export class ClientAccountSettingsComponent implements OnInit {
   private token: any;
 
   constructor(private httpFile:FileUploadService,
-              private jwtHelper: JwtHelperService,private cookieService : CookieService,
+              private cookieService : CookieService,
               private httpClientService: HttpClientService,
               private route: ActivatedRoute,
+              private router: Router,
               private httpClientSettings: ClientSettingsPageService) { }
 
   ngOnInit(): void {
@@ -51,7 +47,10 @@ export class ClientAccountSettingsComponent implements OnInit {
         this.token = res.body;
         this.getClaimsFromToken(this.token);
       },error => {
-        console.log(error)
+        if(error){
+          this.router.navigate(["/login"])
+          console.clear();
+        }
       })
   }
 
@@ -118,10 +117,14 @@ export class ClientAccountSettingsComponent implements OnInit {
       (event:any) =>{
         if(typeof (event) === "object"){
           this.loading = false
-          this.opened = false
         }
+        this.opened = false
+        window.location.reload();
+
       },
       error => {
+        this.fileError = error.body
+        this.loading = false
         console.log(error)
       }
     );

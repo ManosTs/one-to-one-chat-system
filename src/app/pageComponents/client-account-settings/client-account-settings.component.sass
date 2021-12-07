@@ -3,7 +3,7 @@
 $primary: rgb(255, 255, 255)
 $secondary: rgb(56, 52, 55)
 
-.profile-card
+.top-container
   @extend .container-fluid
   border: none
   border-radius: 0
@@ -16,16 +16,22 @@ $secondary: rgb(56, 52, 55)
   height: 100px
   border-radius: 50%
   background: $primary
+  border: 1px solid #383437
 
 .name-div
   font-size: 1.3em
   color: $primary
   background: none
+  position: absolute
+  margin-left: 165px
+  top: 0
+  margin-top: 90px
 
-.email-div
-  color: $primary
-  background: none
-  margin-bottom: 5px
+.profile-pic-position
+  @extend .container-sm
+  position: absolute
+  margin-left: 50px
+  margin-top: 60px
 
 .image-container
   color: white
@@ -55,11 +61,14 @@ $secondary: rgb(56, 52, 55)
   background-color: $secondary
   margin: 10% auto /* 15% from the top and centered */
   width: 50% /* Could be more or less, depending on screen size */
-  height: 50%
+  height: 60%
   max-height: 100%
   text-align: center
   float: none
   overflow: auto
+  @media screen and (max-width: 500px and 700px)
+    width: 70%
+    height: 70%
 
 .pModal-profile-picture
   width: 150px
@@ -67,6 +76,7 @@ $secondary: rgb(56, 52, 55)
   border-radius: 50%
   background: $primary
   float: none
+  margin-bottom: 10px
 
 .cancel-button
   border-radius: 25px
@@ -80,9 +90,11 @@ $secondary: rgb(56, 52, 55)
   padding-top: 5px
   padding-bottom: 5px
   overflow: hidden
-  margin-top: 10px
+  margin-top: 20px
   @media screen and (max-width: 700px)
     width: 50%
+  @media screen and (max-width: 500px)
+    width: 70%
 
 .cancel-button:hover
   border: 1px solid white
@@ -109,10 +121,12 @@ $secondary: rgb(56, 52, 55)
   width: 20%
   padding-top: 5px
   padding-bottom: 5px
-  margin-top: 15px
+  margin-top: 25px
   overflow: hidden
   @media screen and (max-width: 700px)
     width: 50%
+  @media screen and (max-width: 500px)
+    width: 70%
 
 .add-photo-button:hover
   border: 1px solid white

@@ -16,7 +16,8 @@
         />
       </form>
       <button class="add-photo-button" type="button"
-              (click)="uploadFile()">{{loading ? "Uploading..." : "Upload Photo"}}</button><br/>
+              (click)="uploadFile()">{{loading ? "Uploading..." : "Upload Photo"}}</button>
+      <br/>
 
       <button class="cancel-button" (click)="open()" type="button">
         Cancel
@@ -26,12 +27,24 @@
   </div>
 </div>
 
-<div class="profile-card">
+<div class="profile-pic-position">
   <button (click)="open()" type="button" class="profile-pic-button">
     <img class="profile-picture" src="{{url}}" alt="profile_picture"/>
   </button>
+
+</div>
+<div class="top-container">
+  <form >
+    <input id="search"
+           placeholder="Search people..."
+           name="search"
+           type="text"
+           autofocus
+    />
+  </form><br/><br/><br/><br/>
   <div class="name-div">
     <p *ngIf="fullName">{{fullName}}</p>
   </div>
 </div>
+
 </body>

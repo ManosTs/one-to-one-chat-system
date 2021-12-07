@@ -1,14 +1,12 @@
-import {AfterViewInit, Component, OnInit, Sanitizer} from '@angular/core';
+import {AfterViewInit, Component, Input, OnInit, Sanitizer} from '@angular/core';
 import {HomePageService} from "../../services/page/homePage/home-page.service";
 import {CookieService} from "ngx-cookie-service";
-import {JwtHelperService} from "@auth0/angular-jwt";
 import {ActivatedRoute, Router} from "@angular/router";
 import {FileUploadService} from "../../services/client/file-upload.service";
 import {WebSocketService} from "../../services/message/web-socket.service";
 import {HttpClientService} from "../../services/client/http-client.service";
 import {DatePipe} from "@angular/common";
-import {DomSanitizer} from "@angular/platform-browser";
-import {resolve} from "@angular/compiler-cli/src/ngtsc/file_system";
+
 @Component({
   selector: 'app-home-page',
   templateUrl: './home-page.component.html',
@@ -22,21 +20,23 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   public time: any;
   public isActive: boolean = false;
   public lastLogOn: any;
-  public lastSeen:any;
+  public lastSeen: any;
 
-  public token:any;
+  public token: any;
 
-  public searchPeople = "";
+  public keyword = "";
 
   colors = [{status: true, color: "green"}, {status: false, color: "grey"}]
-  public clientsList:any = [];
+  public clientsList: any = [];
 
   private decodedToken: any;
   private clientID: any;
+  public foundClients: string = "";
+
+  @Input() searchedWord: string = "";
 
   constructor(private httpHomePageService: HomePageService,
               private cookieService: CookieService,
-              private jwtHelper: JwtHelperService,
               private router: Router,
               private route: ActivatedRoute,
               private http: FileUploadService,
@@ -49,20 +49,23 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   //---------------------------------------------------------------------------------------//
 
   ngOnInit(): void {
-    this.httpHomePageService.verifyAccess().subscribe(res =>{
+    this.httpHomePageService.verifyAccess().subscribe(res => {
       this.token = res.body;
       this.getClaimsFromToken(this.token);
-    },error => {
-      console.log(error)
+      this.connect()
+      this.getAllClients()
+    }, error => {
+      if (error) {
+        this.router.navigate(["/login"])
+        console.clear()
+      }
     })
-
-    this.connect()
-
   }
-  lastSeenGetter(clientID:any){
+
+  lastSeenGetter(clientID: any) {
     this.httpClient.lastSeen(clientID).subscribe(
-      res =>{
-        if(res.body == 0){
+      res => {
+        if (res.body == 0) {
           this.lastSeen = "now";
           return;
         }
@@ -79,13 +82,13 @@ export class HomePageComponent implements OnInit, AfterViewInit {
 
   }
 
-  getClaimsFromToken(encryptedToken:any){
+  getClaimsFromToken(encryptedToken: any) {
     this.httpClient.getClaimsFromToken(encryptedToken).subscribe(
       data => {
         this.decodedToken = data.body;
         this.clientID = `${(this.decodedToken)["claims"]["client_id"]}`
         this.fullName = `${(this.decodedToken)["claims"]['first_name']}` + " "
-                                                        + `${(this.decodedToken)["claims"]['last_name']}`
+          + `${(this.decodedToken)["claims"]['last_name']}`
 
         this.isUserActive(this.clientID);
         this.lastLogon(this.clientID);
@@ -99,7 +102,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
 
   }
 
-  isUserActive(clientID:any) {
+  isUserActive(clientID: any) {
     this.httpClient.isUserActive(clientID).subscribe(
       data => {
         this.isActive = data.body;
@@ -111,8 +114,8 @@ export class HomePageComponent implements OnInit, AfterViewInit {
     );
   }
 
-  changeStatus(clientID:any,status: boolean) {
-    this.httpClient.changeStatus(clientID,status).subscribe(
+  changeStatus(clientID: any, status: boolean) {
+    this.httpClient.changeStatus(clientID, status).subscribe(
       data => {
         this.isActive = data.body
       },
@@ -124,13 +127,13 @@ export class HomePageComponent implements OnInit, AfterViewInit {
 
   onActiveStatusChange() {
     this.isActive = !this.isActive
-    this.changeStatus(this.clientID,this.isActive)
-    if(!this.isActive){
+    this.changeStatus(this.clientID, this.isActive)
+    if (!this.isActive) {
 
     }
   }
 
-  lastLogon(clientID:any) {
+  lastLogon(clientID: any) {
     this.httpClient.lastLogon(clientID).subscribe(
       data => {
         let date = data.body;
@@ -141,13 +144,14 @@ export class HomePageComponent implements OnInit, AfterViewInit {
       }
     );
   }
+
   //sign out user
   signOut() {
     this.httpClient.logoutUser(this.clientID).subscribe(
       res => {
         this.disconnect();
         this.cookieService.delete("enc_token")
-        this.router.navigate(["/login"], {queryParams: {id: this.clientID}, queryParamsHandling: "merge"}).then(res =>{
+        this.router.navigate(["/login"], {queryParams: {id: this.clientID}, queryParamsHandling: "merge"}).then(res => {
         })
       },
       error => {
@@ -161,16 +165,18 @@ export class HomePageComponent implements OnInit, AfterViewInit {
 
   //navigate user to settings page
   getClientToSettings() {
-    this.router.navigate(['/settings'],{queryParams: {
+    this.router.navigate(['/settings'], {
+      queryParams: {
         id: this.clientID
 
-      },queryParamsHandling: ""});
+      }, queryParamsHandling: ""
+    });
   }
 
   //----------------------------------------------------------------------------------------//
 
   //method to retrieve the data of user pic in order to show to
-  getClientProfilePhoto(clientID:any) {
+  getClientProfilePhoto(clientID: any) {
     this.http.getFile(clientID).subscribe(
       data => {
         this.imageUrl = "data:image/png;base64," + data.body;
@@ -222,15 +228,21 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   //-------------------------------------------------------------------------------------------//
 
 
-  getAllClientsByFirstName() :any{
+  getAllClients() {
     this.httpClient.getAllClients().subscribe(
-      data=>{
-        if(data){
-          this.clientsList = data.body;
-        }
-      },error => {
+      data => {
+        this.clientsList = data.body;
+      }, error => {
         console.log(error)
       }
     )
+  }
+
+  getClientByKeyword() {
+    this.httpClient.getClientByKeyword(this.searchedWord).subscribe(res => {
+      this.foundClients = res.body
+    }, error => {
+      console.log(error)
+    })
   }
 }

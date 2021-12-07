@@ -21,7 +21,7 @@ export class FileUploadService {
 
     // Make http post request over api
     // with formData as req
-    return this.httpClient.post(this.url + "upload/id="+id, formData)
+    return this.httpClient.post(this.url + "upload/id="+id, formData, {responseType: "text"})
   }
 
   public getFile(id:string) : Observable<any>{

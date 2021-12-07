@@ -1,10 +1,6 @@
 import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild, ViewRef} from '@angular/core';
 import {HttpClientService, LoginUser} from "../../services/client/http-client.service";
-import {HttpResponse} from "@angular/common/http";
 import {CookieService} from "ngx-cookie-service";
-import {check, wind} from "ngx-bootstrap-icons";
-import {map, tap} from "rxjs/operators";
-import {JwtHelperService} from "@auth0/angular-jwt";
 import {FileUploadService} from "../../services/client/file-upload.service";
 import {Router} from "@angular/router";
 
@@ -39,7 +35,6 @@ export class LoginFormComponent implements OnInit {
   user: LoginUser = new LoginUser("", "");
 
   constructor(private httpClientService: HttpClientService, private cookie: CookieService,
-              private jwtHelper: JwtHelperService,
               private httpFile: FileUploadService,
               private router: Router) {
 
@@ -137,23 +132,22 @@ export class LoginFormComponent implements OnInit {
   autoCompleteCred() {
     let token = window.localStorage.getItem("token")
     if (token != null) {
-      this.user.email = (this.jwtHelper.decodeToken(token))['sub']
       this.remember = true
-      this.getClientProfile(token);
+      // this.getClientProfile(token);
     }
   }
 
-  getClientProfile(token: any) {
-    token = window.localStorage.getItem("token")
-    this.httpFile.getFile((this.jwtHelper.decodeToken(token))['profile_picture']).subscribe(
-      data => {
-        this.url = "data:image/png;base64," + data.headers.get("File-Data");
-      },
-      error => {
-        console.log(error)
-      }
-    )
-  }
+  // getClientProfile(token: any) {
+  //   token = window.localStorage.getItem("token")
+  //   this.httpFile.getFile((this.jwtHelper.decodeToken(token))['profile_picture']).subscribe(
+  //     data => {
+  //       this.url = "data:image/png;base64," + data.headers.get("File-Data");
+  //     },
+  //     error => {
+  //       console.log(error)
+  //     }
+  //   )
+  // }
 
   onSubmit() {
     let isFormValid = this.validationForm();

@@ -29,10 +29,11 @@
            placeholder="Search people..."
            name="search"
            type="text"
-           [(ngModel)]="searchPeople"
+           [(ngModel)]="searchedWord"
            autofocus
     />
-    <button (click)="getAllClientsByFirstName()" id="search-button" type="submit">Search</button>
+    <button (click)="getClientByKeyword()" id="search-button" type="submit">Search</button>
+    <p *ngIf="foundClients" style="color:white"> Found: {{foundClients}}</p>
   </form>
 </div>
 
@@ -80,4 +81,6 @@
     </div>
   </div>
 </div>
+
+{{clientsList}}
 </body>

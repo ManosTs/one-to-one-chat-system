@@ -13,7 +13,7 @@ export class HomePageService {
   public verifyAccess() : Observable<any>{
     return this.httpHomePage.get(this.url,{
       observe: 'response',
-      responseType: "text" ,
+      responseType: "text",
       withCredentials: true
     })
   }
