@@ -7,13 +7,18 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface ClientRepository extends JpaRepository<Client,String> {
+public interface ClientRepository extends JpaRepository<Client, String> {
     Client findClientByEmail(String email);
 
     Client findClientByToken(String token);
 
     Client findClientById(String id);
 
-    @Query("SELECT firstName, lastName FROM Client")
-    List<Object[]> findAllGroupByFirstName();
+    @Query("select c.firstName, c.lastName " +
+                        "from Client c where c.firstName like %?1% " +
+                             "or c.lastName like %?1%")
+    List<Object[]> findByKeyword(String name);
+
+    @Query("select c.firstName, c.lastName from Client c")
+    List<Object[]> findAllClients();
 }

@@ -34,16 +34,6 @@ public class ClientSettingsPageController {
 
     @GetMapping
     public ResponseEntity<?> verifyAccess(HttpServletRequest request) throws ParseException, JOSEException {
-        Cookie cookie1 = WebUtils.getCookie(request, "enc_token");
-
-        if(cookie1 == null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(false);
-        }
-
-        if(!jwtBuilder.verifyToken(cookie1.getValue().substring(7))){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(false);
-        }
-
-        return ResponseEntity.ok().body(cookie1.getValue().substring(7));
+        return HomePageController.getResponseEntity(request, jwtBuilder);
     }
 }

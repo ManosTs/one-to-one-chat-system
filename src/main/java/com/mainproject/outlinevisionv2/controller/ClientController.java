@@ -76,10 +76,16 @@ public class ClientController {
     }
     //-----------------------------------------------------------------------------------------------------------------//
 
-    @GetMapping(value = "/all")
-    public ResponseEntity<?> getClientsByFirstName(){
-        List<Object[]> clientsList = clientRepository.findAllGroupByFirstName();
-        return ResponseEntity.ok().body(clientsList);
+    @GetMapping(value = "/findClientByName")
+    public ResponseEntity<?> getClientByKeyword(@RequestParam("name") String name){
+        List<Object[]> clients = clientRepository.findByKeyword(name);
+        return ResponseEntity.ok().body(clients);
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getAllClients(){
+        List<Object[]> list =  clientRepository.findAllClients();
+        return ResponseEntity.ok().body(list);
     }
 
     @PostMapping(value = "/register")
@@ -232,4 +238,5 @@ public class ClientController {
 
         return ResponseEntity.ok().body(claims);
     }
+
 }

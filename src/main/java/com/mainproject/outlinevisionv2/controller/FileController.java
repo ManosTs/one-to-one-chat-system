@@ -41,7 +41,7 @@ public class FileController {
     }
 
     @PostMapping(value = "/upload/id={id}")
-    public ResponseEntity uploadFile(@RequestParam("file") MultipartFile file, @PathVariable String id){
+    public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file, @PathVariable String id){
         String message = "";
         Client clientFound = clientRepository.findClientById(id);
         try {

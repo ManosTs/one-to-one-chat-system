@@ -36,6 +36,10 @@ public class HomePageController {
 
     @GetMapping
     public ResponseEntity<?> verifyAccess(HttpServletRequest request) throws ParseException, JOSEException {
+        return getResponseEntity(request, jwtBuilder);
+    }
+
+    public static ResponseEntity<?> getResponseEntity(HttpServletRequest request, JWTBuilder jwtBuilder) throws ParseException, JOSEException {
         Cookie cookie = WebUtils.getCookie(request, "enc_token");
 
         if(cookie == null){
