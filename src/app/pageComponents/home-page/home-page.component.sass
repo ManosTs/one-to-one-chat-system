@@ -26,15 +26,12 @@ $secondary: rgb(56, 52, 55)
   background-color: #888287
 
 #message-output
-  display: inline
   width: 100%
+  border-radius: 50px
   background: $secondary
   color: white
   margin-top: 2px
-  text-align: center
   resize: none
-  overflow-y: scroll
-  overflow-x: hidden
   padding-left: 10px
 
 #profile-picture
@@ -62,6 +59,7 @@ $secondary: rgb(56, 52, 55)
 .messageInput
   text-align: center
   margin-bottom: 10px
+  overflow: hidden
 
 #message
   display: inline-block
@@ -77,10 +75,12 @@ $secondary: rgb(56, 52, 55)
   outline: none
 
 .send-button
+  position: relative
   border: none
   border-radius: 25px
   outline: none
-  padding: 2px 10px
+  padding: 5px 20px
+  margin-left: 5px
   color: $primary
   background: $secondary
 
