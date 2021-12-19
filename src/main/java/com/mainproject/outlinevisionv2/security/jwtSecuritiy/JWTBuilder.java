@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.KeyFactory;
@@ -29,6 +30,8 @@ import java.security.interfaces.*;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.*;
 import com.nimbusds.jwt.*;
+
+import javax.crypto.Cipher;
 
 
 @Component
@@ -118,7 +121,6 @@ public class JWTBuilder {
         EncryptedJWT jwt = EncryptedJWT.parse(jwtString);
         // Create a rsaDecrypter with the specified private RSA key
         RSADecrypter rsaDecrypter = new RSADecrypter(privateKey);
-
         // Decrypt
         jwt.decrypt(rsaDecrypter);
 

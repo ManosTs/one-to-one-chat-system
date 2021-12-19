@@ -9,8 +9,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.WebUtils;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 
 @CrossOrigin(origins = "http://localhost:4200",allowCredentials = "true")
@@ -33,7 +38,7 @@ public class ClientSettingsPageController {
     }
 
     @GetMapping
-    public ResponseEntity<?> verifyAccess(HttpServletRequest request) throws ParseException, JOSEException {
+    public ResponseEntity<?> verifyAccess(HttpServletRequest request) throws ParseException, JOSEException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return HomePageController.getResponseEntity(request, jwtBuilder);
     }
 }

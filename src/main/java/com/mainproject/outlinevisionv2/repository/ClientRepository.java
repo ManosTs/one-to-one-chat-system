@@ -19,6 +19,10 @@ public interface ClientRepository extends JpaRepository<Client, String> {
                              "or c.lastName like %?1%")
     List<Object[]> findByKeyword(String name);
 
-    @Query("select c.firstName, c.lastName from Client c")
-    List<Object[]> findAllClients();
+    @Query(
+            "select c.firstName, c.lastName, c.id " +
+            "from Client c " +
+            "where c.isActive = true"
+          )
+    List<Object[]> findAllActiveClients();
 }

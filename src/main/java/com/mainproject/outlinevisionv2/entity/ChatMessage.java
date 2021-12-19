@@ -9,6 +9,18 @@ public class ChatMessage {
     private String time;
     private String clientId;
 
+    //constructor
+
+
+    public ChatMessage(MessageType messageType, String content, String sender, String time) {
+        this.messageType = messageType;
+        this.content = content;
+        this.sender = sender;
+        this.time = time;
+    }
+
+    public ChatMessage(){}
+
     public enum MessageType{
         RECEIVED,
         DELIVERED
