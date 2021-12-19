@@ -3,9 +3,6 @@ import {webSocket} from "rxjs/webSocket";
 import {Stomp} from "@stomp/stompjs";
 import * as SockJS from "sockjs-client";
 import {DatePipe} from "@angular/common";
-import {Timestamp} from "rxjs";
-import {HomePageService} from "../page/homePage/home-page.service";
-import {HomePageComponent} from "../../pageComponents/home-page/home-page.component";
 import {FileUploadService} from "../client/file-upload.service";
 
 @Injectable({
@@ -15,10 +12,8 @@ export class WebSocketService {
   stompClient: any;
 
   public message: string[] = [];
-  public time: string[] = [];
-  public sender: string[] = [];
 
-  constructor(private fileService:FileUploadService) {
+  constructor(private fileService:FileUploadService,private datePipe: DatePipe) {
   }
   //--------------------------------------------------------------------------------//
 
@@ -36,15 +31,17 @@ export class WebSocketService {
 
   //connect user to websocket session and get message objects
   connect() {
-    let socket = new SockJS("http://localhost:8080/ws");
-    this.stompClient = Stomp.over(socket);
+
+    this.stompClient = Stomp.over(function(){
+      return new SockJS("http://localhost:8080/ws"); //reconnecting purpose
+    });
+
     this.stompClient.connect({}, (frame:any) => {
       this.stompClient.subscribe('/topic/public', (message: any) => {
+
         if(message.body) {
           let messageOutPut = JSON.parse(message.body)
-          this.message.push(messageOutPut.content);
-          this.time.push(messageOutPut.time);
-          this.sender.push(messageOutPut.sender);
+          this.message.push(messageOutPut.time+" | "+messageOutPut.sender+": "+messageOutPut.content);
         }
       })
     })

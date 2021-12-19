@@ -25,49 +25,22 @@ $secondary: rgb(56, 52, 55)
 #search-button:hover
   background-color: #888287
 
-#chat-icon
-  color: $secondary
-  border: none
-  background: none
-
-.message-output
-  @extend .col
-  border-radius: 25px
+#message-output
+  display: inline
+  width: 100%
   background: $secondary
   color: white
   margin-top: 2px
-  text-align: left
-  float: left
-  padding-left: 205px
-
-.insideChat
-  overflow: auto
-
-#message-output-profile
-  width: 25px
-  border-radius: 50%
-  background-color: $primary
-
-.name-output-config
-  position: absolute
-  left: 0
-  margin-left: 15px
+  text-align: center
+  resize: none
+  overflow-y: scroll
+  overflow-x: hidden
+  padding-left: 10px
 
 #profile-picture
   width: 40px
   border-radius: 50%
   background-color: $primary
-
-#profile
-  margin-right: 5px
-  width: 40px
-  border-radius: 50%
-  background-color: $primary
-
-.friend-container
-  margin-top: 10px
-  margin-bottom: 10px
-  width: 100%
 
 .active-icon
   color: green
@@ -86,59 +59,9 @@ $secondary: rgb(56, 52, 55)
   width: 100%
   border-top: 1px solid white
 
-.friends-col
-  @extend .col-3
-  border: none
-  width: 100%
-  color: white
-  font-size: 1.1em
-  background: $secondary
-
-#nav-friends-title
-  width: 100%
-  font-size: 1.2em
-  border-bottom: 1px solid white
-
-#brand
-  color: $primary
-  outline: none
-
-#brand:link
-  text-decoration: none
-
-#brand:visited
-  text-decoration: none
-
-#brand:hover
-  color: lightgray
-  text-decoration: none
-
-#brand:active
-  text-decoration: none
-
-.chat-col
-  @extend .col
-  width: 100%
+.messageInput
   text-align: center
-  background-color: #aaa
-
-.message-output-col
-  @extend .col
-  margin-bottom: 5px
-
-.message-input-col
-  @extend .col
-
-#showTimeOnSenderName
-  outline: none
-  background: none
-  border: none
-
-#time
-  position: absolute
-  top: 0
-  float: left
-  color: white
+  margin-bottom: 10px
 
 #message
   display: inline-block
@@ -147,8 +70,7 @@ $secondary: rgb(56, 52, 55)
   margin-top: 10px
   padding-left: 10px
   padding-right: 10px
-  resize: vertical
-  overflow: auto
+  resize: none
   outline: none
 
 #message:focus

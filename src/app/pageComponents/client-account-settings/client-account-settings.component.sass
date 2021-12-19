@@ -3,35 +3,41 @@
 $primary: rgb(255, 255, 255)
 $secondary: rgb(56, 52, 55)
 
-.top-container
-  @extend .container-fluid
-  border: none
-  border-radius: 0
-  background-color: $secondary
-  text-align: left
-  overflow: hidden
 
 .profile-picture
-  width: 100px
-  height: 100px
+  width: 125px
+  height: 125px
   border-radius: 50%
   background: $primary
-  border: 1px solid #383437
+
+.background-picture
+  position: fixed
+  top: 0
+  left: 0
+  width: 100%
+  height: 20%
+  max-height: 100%
+  outline: none
+  box-shadow: none
+  background-color: #888287
 
 .name-div
-  font-size: 1.3em
-  color: $primary
-  background: none
   position: absolute
-  margin-left: 165px
+  display: inline-block
   top: 0
-  margin-top: 90px
+  margin-top: 80px
+  margin-left: 10px
+  font-size: 1.4em
+  color: $secondary
+  background: none
 
 .profile-pic-position
-  @extend .container-sm
   position: absolute
-  margin-left: 50px
-  margin-top: 60px
+  width: 50%
+  margin-left: 5px
+  margin-top: 10px
+  @media screen and (max-width: 400px)
+    margin-top: 25px
 
 .image-container
   color: white
@@ -39,10 +45,19 @@ $secondary: rgb(56, 52, 55)
   overflow: hidden
 
 .profile-pic-button
+  width: 125px
+  height: 125px
+  border-radius: 50%
   background: none
   border: none
   outline: none
   box-shadow: none
+
+.background-pic-button
+  border: none
+  outline: none
+  box-shadow: none
+  background: none
 
 .pModal
   position: fixed

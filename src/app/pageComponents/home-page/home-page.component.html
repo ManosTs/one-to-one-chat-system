@@ -37,50 +37,66 @@
   </form>
 </div>
 
-<div class="main-container">
+<div class="container" style="margin-top: 10px">
   <div class="row">
-    <div class="friends-col">
-      <div class="friend-container">
-        <div class="img-and-name">
-          <img id="profile" src="{{imageUrl}}" alt="profile_picture"/> {{fullName}}
-        </div>
+    <div style="border: 1px solid black" class="col-sm">
+      <p style="border: 1px solid black;text-align: center; margin-top: 5px">ACTIVE PEOPLE</p>
+      <ul>
+        <li *ngFor="let activeClients of activeClientsList" class="img-and-name">
+          {{activeClients}}
+        </li>
+      </ul>
+    </div>
+    <div style="border: 1px solid black; border-left: 0" class="col-sm">
+      <div style="margin-bottom: 10px;">
+          <textarea *ngFor="let msg of webSocket.message " id="message-output" readonly>
+                  {{msg}}
+          </textarea>
       </div>
     </div>
-
-    <div class="chat-col">
-      <div class="row">
-        <div class="message-output-col">
-          <span class="message-output" *ngFor="let msg of webSocket.message ">
-            {{msg}}
-
-            <span *ngFor="let sender of webSocket.sender" class="name-output-config">
-              <span *ngFor="let time of webSocket.time">
-               {{time}}-
-            </span>
-              {{sender}}:
-            </span>
-
-
-
-          </span>
-        </div>
-      </div>
-      <div class="row">
-        <div class="message-input-col">
-          <div class="messageInput">
-            <form (ngSubmit)="handleSubmit($event)">
-              <input name="message" (keyup)="onEnterSendMsg($event)" [(ngModel)]="message"
-                     placeholder="Type a message..." id="message" type="text"/>
-              <button (click)="sendMessage()" type="submit" class="send-button">
-                SEND
-              </button>
-            </form>
-          </div>
-        </div>
+    <div class="w-100"></div>
+    <div style="border: 1px solid black; border-top:0; border-right: 0" class="col-sm"></div>
+    <div style="border: 1px solid black; border-top:0" class="col-sm">
+      <div class="messageInput">
+        <form (ngSubmit)="handleSubmit($event)">
+          <textarea name="message" (keyup)="onEnterSendMsg($event)" [(ngModel)]="message"
+                    placeholder="Type a message..." id="message" type="text"></textarea>
+          <button (click)="sendMessage()" type="button" class="send-button">
+            SEND
+          </button>
+        </form>
       </div>
     </div>
   </div>
 </div>
 
-{{clientsList}}
+<!--<div class="main-container">-->
+<!--  <div class="row">-->
+<!--    <div class="friends-col">-->
+<!--      <div class="friend-container">-->
+<!--        <p style="border: 1px solid white;text-align: center">ACTIVE PEOPLE</p>-->
+<!--        <ul>-->
+<!--          <li *ngFor="let activeClients of activeClientsList" class="img-and-name">-->
+<!--            {{activeClients}}-->
+<!--          </li>-->
+<!--        </ul>-->
+<!--      </div>-->
+<!--    </div>-->
+
+<!--    <textarea *ngFor="let msg of webSocket.message " id="message-output" readonly>-->
+<!--            {{msg}}-->
+<!--    </textarea>-->
+<!--    <div class="message-input-col">-->
+<!--      <div class="messageInput">-->
+<!--        <form (ngSubmit)="handleSubmit($event)">-->
+<!--          <textarea name="message" (keyup)="onEnterSendMsg($event)" [(ngModel)]="message"-->
+<!--                 placeholder="Type a message..." id="message" type="text"></textarea>-->
+<!--          <button (click)="sendMessage()" type="submit" class="send-button">-->
+<!--            SEND-->
+<!--          </button>-->
+<!--        </form>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
 </body>

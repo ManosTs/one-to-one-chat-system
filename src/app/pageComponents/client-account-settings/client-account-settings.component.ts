@@ -16,15 +16,21 @@ export class ClientAccountSettingsComponent implements OnInit {
 
   public loading:boolean = false;
   public message: string = '';
-  public fileError: string = '';
-  public opened: boolean = false;
+  public ProfPicFileError: string = '';
+  public prof_modal_opened: boolean = false;
 
-  public getNewImageData:any
+  public backpic_modal_opened: boolean = false;
+
+  public getNewProfPicData:any;
+
+  public getNewBackpicData:any;
 
   isFileChosen:any;
 
   private decodedToken : any
-  public url: any;
+  public picUrl: any;
+
+  public backpicUrl = "https://images.pexels.com/photos/1301585/pexels-photo-1301585.jpeg?cs=srgb&dl=pexels-suzy-hazelwood-1301585.jpg&fm=jpg"
 
   public fullName: string = "";
   private clientID: any;
@@ -59,7 +65,7 @@ export class ClientAccountSettingsComponent implements OnInit {
   getClientProfilePhoto(clientID:any){
     this.httpFile.getFile(clientID).subscribe(
       data =>{
-        this.url = "data:image/png;base64,"+data.body;
+        this.picUrl = "data:image/png;base64,"+data.body;
       },
       error => {
         console.log(error)
@@ -67,8 +73,12 @@ export class ClientAccountSettingsComponent implements OnInit {
     )
   }
 
-  open() {
-    this.opened = !this.opened
+  openProfModal() {
+    this.prof_modal_opened = !this.prof_modal_opened
+  }
+
+  openBackpicModal(){
+    this.backpic_modal_opened = !this.backpic_modal_opened
   }
 
   file:any
@@ -100,14 +110,14 @@ export class ClientAccountSettingsComponent implements OnInit {
     // this.isFileChosen = true
     const mimeType = this.file.type;
     if (mimeType.match(/image\/*/) == null) {
-      this.fileError = "ONLY IMAGES ARE SUPPORTED!";
+      this.ProfPicFileError = "ONLY IMAGES ARE SUPPORTED!";
       return;
     }
 
     //read data from file
     reader.readAsDataURL(this.file);
     reader.onload = (_event) => {
-      this.getNewImageData = reader.result as string
+      this.getNewProfPicData = reader.result as string
     }
   }
 
@@ -118,12 +128,12 @@ export class ClientAccountSettingsComponent implements OnInit {
         if(typeof (event) === "object"){
           this.loading = false
         }
-        this.opened = false
+        this.prof_modal_opened = false
         window.location.reload();
 
       },
       error => {
-        this.fileError = error.body
+        this.ProfPicFileError = error.body
         this.loading = false
         console.log(error)
       }

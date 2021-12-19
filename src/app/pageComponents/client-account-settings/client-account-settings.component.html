@@ -1,16 +1,17 @@
 <body>
-<div class="pModal" *ngIf="opened">
+<div class="pModal" *ngIf="prof_modal_opened">
   <div class="pModal-content">
     <div class="image-container">
-      <img class="pModal-profile-picture" src="{{getNewImageData ? getNewImageData : url  }}" alt="profile_picture"/>
-      <p *ngIf="fileError" class="errors">
-        {{fileError}}
+      <img class="pModal-profile-picture" src="{{getNewProfPicData ? getNewProfPicData : picUrl  }}"
+           alt="profile_picture"/>
+      <p *ngIf="ProfPicFileError" class="errors">
+        {{ProfPicFileError}}
       </p>
       <form method="post" enctype="multipart/form-data">
         <input (change)="onFileChanged($event)"
                style="color: white;"
                type="file"
-               id="uploadImage"
+               id="uploadProfImage"
                name="image"
                accept="image/png, image/jpeg"
         />
@@ -19,7 +20,7 @@
               (click)="uploadFile()">{{loading ? "Uploading..." : "Upload Photo"}}</button>
       <br/>
 
-      <button class="cancel-button" (click)="open()" type="button">
+      <button class="cancel-button" (click)="openProfModal()" type="button">
         Cancel
       </button>
     </div>
@@ -27,24 +28,51 @@
   </div>
 </div>
 
-<div class="profile-pic-position">
-  <button (click)="open()" type="button" class="profile-pic-button">
-    <img class="profile-picture" src="{{url}}" alt="profile_picture"/>
-  </button>
+<div class="pModal" *ngIf="backpic_modal_opened">
+  <div class="pModal-content">
+    <div class="image-container">
+      <img class="pModal-profile-picture" src="{{getNewBackpicData ? getNewBackpicData : backpicUrl  }}"
+           alt="profile_picture"/>
+      <p *ngIf="ProfPicFileError" class="errors">
+        {{ProfPicFileError}}
+      </p>
+      <form method="post" enctype="multipart/form-data">
+        <input (change)="onFileChanged($event)"
+               style="color: white;"
+               type="file"
+               id="uploadBackImage"
+               name="image"
+               accept="image/png, image/jpeg"
+        />
+      </form>
+      <button class="add-photo-button" type="button"
+              (click)="uploadFile()">{{loading ? "Uploading..." : "Upload Photo"}}</button>
+      <br/>
 
-</div>
-<div class="top-container">
-  <form >
-    <input id="search"
-           placeholder="Search people..."
-           name="search"
-           type="text"
-           autofocus
-    />
-  </form><br/><br/><br/><br/>
-  <div class="name-div">
-    <p *ngIf="fullName">{{fullName}}</p>
+      <button class="cancel-button" (click)="openBackpicModal()" type="button">
+        Cancel
+      </button>
+    </div>
+
   </div>
+</div>
+
+
+<div class="container-sm">
+  <button (click)="openBackpicModal()" type="button" class="background-pic-button">
+    <div class="background-picture"></div>
+  </button>
+    <div class="profile-pic-position">
+      <button (click)="openProfModal()" type="button" class="profile-pic-button">
+        <img class="profile-picture" src="{{picUrl}}" alt="profile_picture"/>
+      </button>
+
+      <div class="name-div">
+        <p *ngIf="fullName">{{fullName}}</p>
+      </div>
+    </div>
+
+
 </div>
 
 </body>

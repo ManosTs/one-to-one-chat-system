@@ -17,7 +17,6 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   public friends: boolean = false;
   public fullName: any;
   public message: any;
-  public time: any;
   public isActive: boolean = false;
   public lastLogOn: any;
   public lastSeen: any;
@@ -27,13 +26,16 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   public keyword = "";
 
   colors = [{status: true, color: "green"}, {status: false, color: "grey"}]
-  public clientsList: any = [];
+  public activeClientsList: string[] = [];
 
   private decodedToken: any;
   private clientID: any;
   public foundClients: string = "";
+  public activeClientImageData: any[] = [];
 
   @Input() searchedWord: string = "";
+  activeClientId: any[] = [];
+
 
   constructor(private httpHomePageService: HomePageService,
               private cookieService: CookieService,
@@ -53,7 +55,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
       this.token = res.body;
       this.getClaimsFromToken(this.token);
       this.connect()
-      this.getAllClients()
+      this.getAllActiveClients()
     }, error => {
       if (error) {
         this.router.navigate(["/login"])
@@ -158,7 +160,6 @@ export class HomePageComponent implements OnInit, AfterViewInit {
         console.log(error);
       }
     );
-
   }
 
   //-----------------------------------------------//
@@ -228,10 +229,18 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   //-------------------------------------------------------------------------------------------//
 
 
-  getAllClients() {
+  getAllActiveClients() {
     this.httpClient.getAllClients().subscribe(
       data => {
-        this.clientsList = data.body;
+        let jsonData = JSON.stringify(data.body);
+        let jsonDataOutput = JSON.parse(jsonData);
+
+        for (let i = 0; i < jsonDataOutput.length; i++) {
+            this.activeClientsList.push(
+              jsonDataOutput[i][0] + " " + jsonDataOutput[i][1]);
+        }
+        console.warn(this.activeClientImageData)
+
       }, error => {
         console.log(error)
       }
@@ -244,5 +253,16 @@ export class HomePageComponent implements OnInit, AfterViewInit {
     }, error => {
       console.log(error)
     })
+  }
+
+  private getActiveClientProfilePhoto(activeClientFileId: any) {
+    this.http.getFile(activeClientFileId).subscribe(
+      data => {
+       this.activeClientImageData.push("data:image/png;base64," + data.body);
+      },
+      error => {
+        console.log(error)
+      }
+    )
   }
 }
