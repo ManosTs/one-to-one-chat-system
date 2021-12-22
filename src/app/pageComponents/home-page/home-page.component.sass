@@ -27,11 +27,13 @@ $secondary: rgb(56, 52, 55)
 
 #message-output
   width: 100%
-  border-radius: 50px
+  min-height: 5em
+  border-radius: 0
   background: $secondary
   color: white
   margin-top: 2px
   resize: none
+  scroll-behavior: smooth
   padding-left: 10px
 
 #profile-picture
@@ -57,35 +59,78 @@ $secondary: rgb(56, 52, 55)
   border-top: 1px solid white
 
 .messageInput
+  @extend .col-sm
+  border: 1px solid black
+  overflow: hidden
   text-align: center
   margin-bottom: 10px
-  overflow: hidden
 
-#message
-  display: inline-block
+.messageOutput
+  @extend .col-sm
   border: 1px solid black
-  border-radius: 25px
+  border-left: 0
+  border-bottom: 0
+
+.activePeopleContainer
+  @extend .col-sm
+  border: 1px solid black
+  border-bottom: 0
+  background-color: #343a40
+  color: white
+
+#activePeopleHeader
+  border: 1px solid white
+  text-align: center
+  margin-top: 5px
+
+#message-input
+  width: 50%
+  border: 1px solid black
+  border-radius: 0
   margin-top: 10px
   padding-left: 10px
   padding-right: 10px
   resize: none
+  scroll-behavior: smooth
   outline: none
 
-#message:focus
+#message-input:focus
   outline: none
 
 .send-button
-  position: relative
+  position: absolute
   border: none
   border-radius: 25px
   outline: none
   padding: 5px 20px
   margin-left: 5px
+  margin-top: 20px
   color: $primary
   background: $secondary
 
+textarea::-webkit-scrollbar
+  width: 10px
+  background: #888287
+
+textarea[readonly]
+  cursor: default
+
+textarea::-webkit-scrollbar-thumb
+  border-radius: 5px
+  cursor: default
+  border: 1px solid black
+  background-color: $primary
+
 .send-button:hover
   opacity: 0.7
+
+
+#showTime
+  width: 100%
+  outline: none
+  border: none
+  box-shadow: none
+  background: none
 
 input:-webkit-autofill,
 input:-webkit-autofill:hover,

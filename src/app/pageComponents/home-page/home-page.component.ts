@@ -239,7 +239,6 @@ export class HomePageComponent implements OnInit, AfterViewInit {
             this.activeClientsList.push(
               jsonDataOutput[i][0] + " " + jsonDataOutput[i][1]);
         }
-        console.warn(this.activeClientImageData)
 
       }, error => {
         console.log(error)
