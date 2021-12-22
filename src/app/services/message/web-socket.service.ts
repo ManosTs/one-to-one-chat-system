@@ -1,5 +1,4 @@
 import {Injectable} from '@angular/core';
-import {webSocket} from "rxjs/webSocket";
 import {Stomp} from "@stomp/stompjs";
 import * as SockJS from "sockjs-client";
 import {DatePipe} from "@angular/common";

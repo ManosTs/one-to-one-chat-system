@@ -28,6 +28,7 @@ $secondary: rgb(56, 52, 55)
 #message-output
   width: 100%
   min-height: 5em
+  display: inline-block
   border-radius: 0
   background: $secondary
   color: white
@@ -35,6 +36,7 @@ $secondary: rgb(56, 52, 55)
   resize: none
   scroll-behavior: smooth
   padding-left: 10px
+  word-wrap: break-word
 
 #profile-picture
   width: 40px
@@ -60,6 +62,7 @@ $secondary: rgb(56, 52, 55)
 
 .messageInput
   @extend .col-sm
+  background-color: $secondary
   border: 1px solid black
   overflow: hidden
   text-align: center
@@ -74,7 +77,7 @@ $secondary: rgb(56, 52, 55)
 .activePeopleContainer
   @extend .col-sm
   border: 1px solid black
-  border-bottom: 0
+  border-bottom: none
   background-color: #343a40
   color: white
 
@@ -84,9 +87,9 @@ $secondary: rgb(56, 52, 55)
   margin-top: 5px
 
 #message-input
-  width: 50%
+  width: 15%
   border: 1px solid black
-  border-radius: 0
+  border-radius: 10px
   margin-top: 10px
   padding-left: 10px
   padding-right: 10px
@@ -96,17 +99,20 @@ $secondary: rgb(56, 52, 55)
 
 #message-input:focus
   outline: none
+  width: 40%
+  transition: all .3s ease-in-out
+
 
 .send-button
   position: absolute
   border: none
-  border-radius: 25px
+  border-radius: 18px
   outline: none
   padding: 5px 20px
   margin-left: 5px
   margin-top: 20px
-  color: $primary
-  background: $secondary
+  color: $secondary
+  background: $primary
 
 textarea::-webkit-scrollbar
   width: 10px
@@ -123,7 +129,6 @@ textarea::-webkit-scrollbar-thumb
 
 .send-button:hover
   opacity: 0.7
-
 
 #showTime
   width: 100%
