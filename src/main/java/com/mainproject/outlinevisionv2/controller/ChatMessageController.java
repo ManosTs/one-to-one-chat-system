@@ -32,7 +32,7 @@ public class ChatMessageController {
     @MessageMapping("/chat.sendMessage")
     @SendTo("/topic/public")
     public ChatMessage sendMessage(@Payload ChatMessage chatMessage) {
-        String time = new SimpleDateFormat("HH:mm a").format(new Date());
+        String time = new SimpleDateFormat("HH:mm").format(new Date());
         return new ChatMessage(chatMessage.getMessageType(),chatMessage.getContent(),chatMessage.getSender(),time);
     }
 
